@@ -1,26 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { hashPassword } from 'src/utils/hashPassword';
+import { ICreateUser } from 'src/shared/interfaces/createUser.interface';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+  constructor(
+    @InjectRepository(User) 
+    private readonly _userRepository: Repository<User>
+  ){}
 
-  findAll() {
-    return `This action returns all user`;
-  }
+  async createUser(body:ICreateUser): Promise<User>{
+    try{
+      const { name, email, phone, description, password, crefito, specialties } = body;
+      
+      const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+      //Verifica se existe algum usuário que já está usando o e-mail informado
+      if(userAlreadyExists){
+        throw new ConflictException("Já existe um usuário cadastrado com esse e-mail!!!")
+      }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+      const userWithCrefito = await this._userRepository.findOne({where: {crefito: crefito}})
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      if(userWithCrefito){
+        throw new ConflictException(
+          'Já existe um usuário cadastrado com esse CREFITO',
+        );
+      }
+
+      const hashedPassword = await hashPassword(password)
+
+      const newUser = this._userRepository.create({
+        name: name,
+        email: email,
+        phone: phone,
+        description: description,
+        password: hashedPassword,
+        crefito: crefito,
+        specialties: specialties
+      })
+      return await this._userRepository.save(newUser);
+    }catch(error){
+    if (error.code === '23505') {
+      throw new ConflictException(
+        'E-mail ou CREFITO já cadastrado',
+      );
+    }
+      throw error;
+    }
   }
 }

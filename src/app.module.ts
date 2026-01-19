@@ -35,7 +35,7 @@ import { EmailModule } from './email/email.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [User, OTP],
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
