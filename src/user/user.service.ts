@@ -1,20 +1,23 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { hashPassword } from 'src/utils/hashPassword';
 import { ICreateUser } from 'src/shared/interfaces/createUser.interface';
+import { OtpService } from 'src/otp/otp.service';
+import { OtpTypes } from 'src/otp/types/otpType';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) 
-    private readonly _userRepository: Repository<User>
+    private readonly _userRepository: Repository<User>,
+    private readonly _otpService: OtpService,
+    private readonly _emailService: EmailService
   ){}
 
-  async createUser(body:ICreateUser): Promise<User>{
+  async createUser(body:ICreateUser): Promise<void>{
     try{
       const { name, email, phone, description, password, crefito, specialties } = body;
       
@@ -44,7 +47,8 @@ export class UserService {
         crefito: crefito,
         specialties: specialties
       })
-      return await this._userRepository.save(newUser);
+      await this._userRepository.save(newUser);
+      return this.emailVerification(newUser, OtpTypes.OTP)
     }catch(error){
     if (error.code === '23505') {
       throw new ConflictException(
@@ -53,5 +57,18 @@ export class UserService {
     }
       throw error;
     }
+  }
+
+  //Enviar código de verificação o link de reset via email
+  async emailVerification(user: User, otpType: OtpTypes){
+    const otp = await this._otpService.generateOTP(user, otpType)
+      const emailDto = {
+        recipients: [user.email],
+        subject: "Código para verificação de conta",
+        html: `Seu código de verificação de conta é: <strong>${otp}</strong>`
+      }
+
+      //Envia código de verificação para o e-mail
+      return await this._emailService.sendEmail(emailDto)
   }
 }

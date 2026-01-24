@@ -18,7 +18,7 @@ export class OTP {
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn()
-  physiotherapist: User;
+  user: User;
 
   @Column()
   token: string;

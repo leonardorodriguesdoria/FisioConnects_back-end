@@ -10,6 +10,6 @@ export class UserController {
   @Post('register')
   async registerNewUser(@Body() userDto: CreateUserDto){
     await this.userService.createUser(userDto);
-    return{message: "Usuário cadastrado com sucesso!!!"}
+    return{message: "Usuário cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
   }
 }
