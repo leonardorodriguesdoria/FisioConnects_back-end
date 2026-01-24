@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { IUserLogin } from 'src/shared/interfaces/loginUser.interface';
 import { comparePassword } from 'src/utils/hashPassword';
+import { OtpService } from 'src/otp/otp.service';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly _userRepository: Repository<User>,
-    private readonly _jwtService: JwtService
+    private readonly _jwtService: JwtService,
+    private readonly _otpService: OtpService
 ){}
 
 createToken(user: User) {
@@ -52,7 +54,7 @@ createToken(user: User) {
   //Login Usuário
   async userLogin(body: IUserLogin){
     try{
-      const {email, password} = body
+      const {email, password, otp} = body
       const user = await this._userRepository.findOne({where: {email: email}})
       if(!user){
         throw new NotFoundException("Usuário não encontrado. Por favor verifique os dados inseridos")
@@ -61,9 +63,18 @@ createToken(user: User) {
       if(!isValidPassword){
         throw new UnauthorizedException("Senha incorreta")
       }
+      if(user.accountStatus === 'unverified'){
+        if(!otp){
+          return{
+            message: 'Sua conta ainda não está verificada. Por favor conclua o processo de verificação'
+          }
+        } else {
+          await this.verifyToken(user.id, otp);
+        }
+      }
       return this.createToken(user)
     }catch(error){
-      if(error instanceof HttpException){
+      if(error instanceof HttpException || error instanceof BadRequestException){
         throw error
       }
       throw new InternalServerErrorException(
@@ -71,4 +82,19 @@ createToken(user: User) {
       )
     }
   }
+
+  async verifyToken(userId: number, token: string){
+    await this._otpService.validateOtp(userId, token)
+
+    const user = await this._userRepository.findOne({
+      where: {id: userId},
+    })
+    if(!user){
+      throw new UnauthorizedException("Usuário não encontrado")
+    }
+    //Se o código é válido, a conta é verificada
+    user.accountStatus = 'verified'
+    return await this._userRepository.save(user);
+  }
 }
+

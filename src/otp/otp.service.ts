@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { OTP } from './entities/otp.entity';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -36,6 +36,24 @@ export class OtpService {
     await this.otpRepository.save(otpEntity);
 
     return otp;
+  }
+
+  async validateOtp(userId: number, token: string): Promise<boolean>{
+    const validToken = await this.otpRepository.findOne({
+      where: {
+        user: {id: userId},
+        expiresAt: MoreThan(new Date())
+      }
+    });
+    if(!validToken){
+      throw new BadRequestException('Código de verificação expirou. Por favor, solicite um novo')
+    }
+    const isMatch = await bcrypt.compare(token, validToken.token)
+    if(!isMatch){
+      throw new BadRequestException('Código inválido. Tente novamente')
+      
+    }
+    return true;
   }
   
 }
