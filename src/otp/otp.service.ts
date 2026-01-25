@@ -7,34 +7,42 @@ import * as crypto from 'crypto';
 import { User } from 'src/user/entities/user.entity';
 import { OtpTypes } from './types/otpType';
 import { hashOTP } from 'src/utils/hashPassword';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OtpService {
   constructor(
     @InjectRepository(OTP)
     private otpRepository: Repository<OTP>,
+    private readonly _jwtService:JwtService,
+    private readonly configService: ConfigService
   ) {}
 
 
-  async generateOTP(
-    user: User,
-    type: OtpTypes,
-  ): Promise<string> {
+  async generateToken(
+  user: User,
+  type: OtpTypes,
+): Promise<string> {
+
+  if (type === OtpTypes.OTP) {
     //Gera um código OTP de 6 digítos
     const otp = crypto.randomInt(100000, 999999).toString();
-    const hashedOTP = await hashOTP(otp)
+    const hashedOTP = await bcrypt.hash(otp, 10);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
 
     //Faz o check-up se o código já existe para aquele usuário
-    const existingOTP = await this.otpRepository.findOne({where: {user: {id: user.id}, type}})
+    const existingOTP = await this.otpRepository.findOne({
+      where: { user: { id: user.id }, type }
+    });
 
-    if(existingOTP){
+    if (existingOTP) {
       //Atualiza o código existente
-      existingOTP.token = hashedOTP,
+      existingOTP.token = hashedOTP;
       existingOTP.expiresAt = expiresAt;
-      await this.otpRepository.save(existingOTP)
-    }else{
+      await this.otpRepository.save(existingOTP);
+    } else {
       //Cria uma entidade de OTP
       const otpEntity = this.otpRepository.create({
         user,
@@ -44,8 +52,21 @@ export class OtpService {
       });
       await this.otpRepository.save(otpEntity);
     }
+
     return otp;
+  }else if(type === OtpTypes.RESET_LINK) {
+    const resetToken = this._jwtService.sign(
+      { id: user.id, email: user.email },
+      {
+        secret: this.configService.get<string>('JWT_RESET_SECRET'),
+        expiresIn: '15m',
+      },
+    );
+    return resetToken;
   }
+  // ✅ garante retorno em todos os caminhos
+  throw new Error('Tipo de token não suportado');
+}
 
   async validateOtp(userId: number, token: string): Promise<boolean>{
     const validToken = await this.otpRepository.findOne({

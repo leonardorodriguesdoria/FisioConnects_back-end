@@ -7,6 +7,7 @@ import { ICreateUser } from 'src/shared/interfaces/createUser.interface';
 import { OtpService } from 'src/otp/otp.service';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { EmailService } from 'src/email/email.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,8 @@ export class UserService {
     @InjectRepository(User) 
     private readonly _userRepository: Repository<User>,
     private readonly _otpService: OtpService,
-    private readonly _emailService: EmailService
+    private readonly _emailService: EmailService,
+    private readonly _configService: ConfigService
   ){}
 
   async createUser(body:ICreateUser): Promise<void>{
@@ -61,16 +63,29 @@ export class UserService {
 
   //Enviar código de verificação o link de reset via email
   async emailVerification(user: User, otpType: OtpTypes){
-    const otp = await this._otpService.generateOTP(user, otpType)
-      const emailDto = {
-        recipients: [user.email],
-        subject: "Código para verificação de conta",
-        html: `Seu código de verificação de conta é: <strong>${otp}</strong>`
-      }
+    const token = await this._otpService.generateToken(user, otpType)
 
-      //Envia código de verificação para o e-mail
-      return await this._emailService.sendEmail(emailDto)
+    if(otpType === OtpTypes.OTP){
+      const emailDto = {
+      recipients: [user.email],
+      subject: "Código para verificação de conta",
+      html: `Seu código de verificação de conta é: <strong>${token}</strong>`
+    }
+
+    //Envia código de verificação para o e-mail
+    return await this._emailService.sendEmail(emailDto)
+  }else if(otpType === OtpTypes.RESET_LINK){
+    const resetLink = `${this._configService.get('RESET_PASSWORD_URL')}?token=${token}`
+    const emailDto = {
+      recipients: [user.email],
+      subject: "Link de redefinição de senha",
+      html: `Clique no link a seguir para redefinir sua senha: <p><a href="${resetLink}">Redefinir Senha</a></p>`
+    };
+
+    //Envia o link de redefinição de senha via e-mail
+    return await this._emailService.sendEmail(emailDto)
   }
+}
 
   //Verifica se o e-mail informado está cadastrado para requisição de um novo código de verificação
   async findByEmail(email: string){

@@ -26,4 +26,16 @@ export class UserController {
     await this.userService.emailVerification(user, OtpTypes.OTP);
     return {message: "Um novo código de verificação foi enviado para seu e-mail"}
   }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotDto: RequestTokenDTO){
+    const {email} = forgotDto;
+    const user = await this.userService.findByEmail(email)
+    if(!user){
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    await this.userService.emailVerification(user, OtpTypes.RESET_LINK);
+    return {message: `Um link de redefinição de senha foi enviado. Por favor, verifique seu e-mail`}
+  }
 }
