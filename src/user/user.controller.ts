@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RequestTokenDTO } from './dto/request-token.dto';
+import { OtpTypes } from 'src/otp/types/otpType';
 
 @Controller('user')
 export class UserController {
@@ -11,5 +13,17 @@ export class UserController {
   async registerNewUser(@Body() userDto: CreateUserDto){
     await this.userService.createUser(userDto);
     return{message: "Usuário cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
+  }
+
+  @Post('request-otp')
+  async requestOtp(@Body() requestTokenDto: RequestTokenDTO){
+    const {email} = requestTokenDto;
+    const user = await this.userService.findByEmail(email)
+    if(!user){
+      throw new NotFoundException("Usuário não encontrado");
+    }
+    //Se o usuário existe, o código é enviado novamente para seu e-mail
+    await this.userService.emailVerification(user, OtpTypes.OTP);
+    return {message: "Um novo código de verificação foi enviado para seu e-mail"}
   }
 }

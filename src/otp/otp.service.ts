@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from 'src/user/entities/user.entity';
 import { OtpTypes } from './types/otpType';
+import { hashOTP } from 'src/utils/hashPassword';
 
 @Injectable()
 export class OtpService {
@@ -21,20 +22,28 @@ export class OtpService {
   ): Promise<string> {
     //Gera um código OTP de 6 digítos
     const otp = crypto.randomInt(100000, 999999).toString();
-    const hashedOTP = await bcrypt.hash(otp, 10);
+    const hashedOTP = await hashOTP(otp)
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
 
-    //Cria uma entidade de OTP
-    const otpEntity = this.otpRepository.create({
-      user,
-      token: hashedOTP,
-      type,
-      expiresAt,
-    });
+    //Faz o check-up se o código já existe para aquele usuário
+    const existingOTP = await this.otpRepository.findOne({where: {user: {id: user.id}, type}})
 
-    await this.otpRepository.save(otpEntity);
-
+    if(existingOTP){
+      //Atualiza o código existente
+      existingOTP.token = hashedOTP,
+      existingOTP.expiresAt = expiresAt;
+      await this.otpRepository.save(existingOTP)
+    }else{
+      //Cria uma entidade de OTP
+      const otpEntity = this.otpRepository.create({
+        user,
+        token: hashedOTP,
+        type,
+        expiresAt,
+      });
+      await this.otpRepository.save(otpEntity);
+    }
     return otp;
   }
 

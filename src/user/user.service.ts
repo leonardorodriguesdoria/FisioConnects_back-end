@@ -71,4 +71,9 @@ export class UserService {
       //Envia código de verificação para o e-mail
       return await this._emailService.sendEmail(emailDto)
   }
+
+  //Verifica se o e-mail informado está cadastrado para requisição de um novo código de verificação
+  async findByEmail(email: string){
+    return await this._userRepository.findOne({where: {email: email}})
+  }
 }
