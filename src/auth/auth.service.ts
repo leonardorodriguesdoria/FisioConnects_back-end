@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { IUserLogin } from 'src/shared/interfaces/loginUser.interface';
 import { comparePassword } from 'src/utils/hashPassword';
 import { OtpService } from 'src/otp/otp.service';
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class AuthService {
@@ -95,6 +97,20 @@ createToken(user: User) {
     //Se o código é válido, a conta é verificada
     user.accountStatus = 'verified'
     return await this._userRepository.save(user);
+  }
+
+  //Função de redefinição de senha
+  async resetPassword(token: string, newPassword: string): Promise<string>{
+    const userId = await this._otpService.validateResetPassword(token)
+    const user = await this._userRepository.findOne({where: {id: userId}});
+    if(!user){
+      throw new BadRequestException('Usuário não encontrado')
+    }
+    //criptografa a nova senha e atualiza a entidade do usuário
+    user.password = await bcrypt.hash(newPassword, 10);
+    await this._userRepository.save(user);
+    
+    return 'Senha redefinida com sucesso!!!'
   }
 }
 

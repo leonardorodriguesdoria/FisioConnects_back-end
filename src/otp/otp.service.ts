@@ -81,9 +81,27 @@ export class OtpService {
     const isMatch = await bcrypt.compare(token, validToken.token)
     if(!isMatch){
       throw new BadRequestException('Código inválido. Tente novamente')
-      
     }
     return true;
   }
-  
+
+  //Função de validação de redefinição de senha
+  async validateResetPassword(token: string){
+    try{
+      //verifica o token JWT e o decodifica
+      const decoded = this._jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_RESET_SECRET')
+      });
+      //Retorna o id do usuário extraído do token se a verificação for um sucesso
+      return decoded.id;
+    }catch(error){
+      //Tratamento de token expirado
+      if(error?.name === 'TokenExpiredError'){
+        throw new BadRequestException(
+          'O link de redefinição de senha expirou.\nPor favor solicite um novo'
+        );
+      }
+      throw new BadRequestException('Token inválido. Por favor solicite um novo e-mail de redefinição')
+    }
+  }
 }
