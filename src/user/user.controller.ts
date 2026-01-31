@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -37,5 +37,14 @@ export class UserController {
 
     await this.userService.emailVerification(user, OtpTypes.RESET_LINK);
     return {message: `Um link de redefinição de senha foi enviado. Por favor, verifique seu e-mail`}
+  }
+
+
+  /*------------------------------------------------------------------------------------------- */
+  /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
+
+  @Get(':id')
+  async getUser(@Param('id', ParseIntPipe) id: number){
+    return this.userService.getOneUser(id);
   }
 }

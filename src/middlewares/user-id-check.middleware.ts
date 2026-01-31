@@ -7,7 +7,7 @@ export class UserIdCheckMiddleware implements NestMiddleware {
         if (isNaN(Number(req.params.id)) || Number(req.params.id) <= 0){
             throw new BadGatewayException('ID inválido')
         }
-        console.log('UserIdCheckMiddleware', 'antes')
+        console.log('UserIdCheckMiddleware', 'depois')
         next();
     }    
 }

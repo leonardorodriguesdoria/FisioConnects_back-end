@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -90,5 +90,21 @@ export class UserService {
   //Verifica se o e-mail informado está cadastrado para requisição de um novo código de verificação
   async findByEmail(email: string){
     return await this._userRepository.findOne({where: {email: email}})
+  }
+
+/*------------------------------------------------------------------------------------------- */
+  /*FUNÇÕES DE CRUD DE PERFIL DO USUÁRIOS */
+
+  async getOneUser(id: number){
+    try{
+      const user = await this._userRepository.findOne({where: {id: id}})
+      if(!user){
+        throw new NotFoundException("Usuário não encontrado")
+      }
+      const {password,resetToken,resetTokenExpiresAt,accountStatus, ...rest} = user;
+      return rest
+    }catch(error){
+      throw new InternalServerErrorException("Erro interno no sistema. Por favor, tente mais tarde")
+    }
   }
 }
