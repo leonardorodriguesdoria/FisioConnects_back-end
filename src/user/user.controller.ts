@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestTokenDTO } from './dto/request-token.dto';
 import { OtpTypes } from 'src/otp/types/otpType';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -39,12 +41,32 @@ export class UserController {
     return {message: `Um link de redefinição de senha foi enviado. Por favor, verifique seu e-mail`}
   }
 
-
   /*------------------------------------------------------------------------------------------- */
   /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
 
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number){
     return this.userService.getOneUser(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Patch('update/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateProfile(
+    @Body() uptateUserDto: UpdateUserDto,
+    @UploadedFile() image: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: number
+  ){
+    if (image) {
+      uptateUserDto.profilePicture = image.path
+    }
+    const updateProfile = await this.userService.updateUser(
+      id,
+      uptateUserDto
+    );
+
+    return {
+      message: 'Dados do perfil atualizados com sucesso!!!',
+      updateProfile,
+    };
   }
 }

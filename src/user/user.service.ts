@@ -8,6 +8,7 @@ import { OtpService } from 'src/otp/otp.service';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
+import { IUpdateUserProfile } from 'src/shared/interfaces/updateUser.interface';
 
 @Injectable()
 export class UserService {
@@ -105,6 +106,36 @@ export class UserService {
       return rest
     }catch(error){
       throw new InternalServerErrorException("Erro interno no sistema. Por favor, tente mais tarde")
+    }
+  }
+
+  async updateUser(id: number,body: IUpdateUserProfile){
+    try{
+      const user = await this._userRepository.findOne({where: {id: id}})
+      if(!user){
+        throw new NotFoundException("Usuário não encontrado!!!!")
+      }
+      if(body.email && body.email !== user.email){
+        const emailInUse = await this._userRepository.findOne({
+          where: {email: body.email}
+        });
+        if(emailInUse){
+          throw new ConflictException(
+            "Este e-mail já está sendo usado por outro usuário"
+          );
+        }
+      }
+      Object.assign(user, body);
+
+      const updatedUser = await this._userRepository.save(user);
+
+      const {password,resetToken,resetTokenExpiresAt,accountStatus, ...response } = updatedUser;
+
+      return response;
+    }catch(error){
+      throw new InternalServerErrorException(
+        'Erro interno do sistema. Por favor tente mais tarde',
+      );
     }
   }
 }
