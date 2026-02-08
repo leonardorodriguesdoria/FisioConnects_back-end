@@ -49,12 +49,8 @@ export class UserController {
   async getUser(@Param('id', ParseIntPipe) id: number){
     return this.userService.getOneUser(id);
   }
-<<<<<<< HEAD
 
 
-=======
-  
->>>>>>> 82faab1decb70b1c7f183b3317b9844708a114e3
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
   @UseInterceptors(FileInterceptor('image'))
