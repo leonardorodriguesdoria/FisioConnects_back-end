@@ -34,8 +34,18 @@ import { JwtModule } from '@nestjs/jwt';
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserIdCheckMiddleware).forRoutes(
-      {path: 'user/:id', method: RequestMethod.GET},
-      {path: 'user/update/:id', method: RequestMethod.PATCH}
+      {
+        path: 'user/:id',
+        method: RequestMethod.GET
+      },
+      {
+        path: 'user/update/:id',
+        method: RequestMethod.PATCH
+      },
+      { 
+        path: 'user/:id', 
+        method: RequestMethod.DELETE 
+      }
     )
   }
 }

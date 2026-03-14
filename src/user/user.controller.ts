@@ -44,11 +44,13 @@ export class UserController {
   /*------------------------------------------------------------------------------------------- */
   /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number){
     return this.userService.getOneUser(id);
   }
-  
+
+
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
   @UseInterceptors(FileInterceptor('image'))

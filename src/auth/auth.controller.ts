@@ -19,12 +19,4 @@ export class AuthController {
     return this.authService.resetPassword(token, password)
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Req() request){
-    return {
-      message: 'Bem vindo',
-      user: request.user, // Obtém do request do usuário
-    }
-  }
 }
