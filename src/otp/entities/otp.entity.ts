@@ -11,12 +11,12 @@ import {
 import { User } from 'src/user/entities/user.entity';
 import { OtpTypes } from '../types/otpType';
 
-@Entity()
+@Entity('otp')
 export class OTP {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE'})
   @JoinColumn()
   user: User;
 

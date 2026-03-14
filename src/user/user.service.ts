@@ -138,4 +138,13 @@ export class UserService {
       );
     }
   }
+
+  async deleteUser(id: number){
+    const user = await this._userRepository.findOne({where: {id: id}});
+    if(!user){
+      throw new NotFoundException("Algo deu errado no carregamento do perfil. Por favor, tente mais tarde")
+    }
+    await this._userRepository.delete(id)
+    return true;
+  }
 }

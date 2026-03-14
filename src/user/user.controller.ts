@@ -70,4 +70,10 @@ export class UserController {
       updateProfile,
     };
   }
+
+  @Delete(':id')
+  async deleteProfile(@Param('id', ParseIntPipe) id: number){
+    await this.userService.deleteUser(id);
+    return{message: 'Conta deleteda com sucesso!!!'}
+  }
 }
