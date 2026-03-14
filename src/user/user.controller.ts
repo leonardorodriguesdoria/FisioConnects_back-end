@@ -44,6 +44,12 @@ export class UserController {
   /*------------------------------------------------------------------------------------------- */
   /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
 
+
+  @Get()
+  async listUsers(){
+    return await this.userService.getAllUsers()
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number){

@@ -96,6 +96,20 @@ export class UserService {
 /*------------------------------------------------------------------------------------------- */
   /*FUNÇÕES DE CRUD DE PERFIL DO USUÁRIOS */
 
+  async getAllUsers(): Promise<Partial<User>[]> {
+    const users = await this._userRepository.find();
+
+    if (users.length === 0) {
+      throw new NotFoundException("Nenhum usuário encontrado em nossos registros");
+    }
+
+    const sanitizedUsers = users.map(
+      ({ password, resetToken, resetTokenExpiresAt, accountStatus, ...rest }) => rest
+    );
+
+    return sanitizedUsers;
+  }
+
   async getOneUser(id: number){
     try{
       const user = await this._userRepository.findOne({where: {id: id}})
