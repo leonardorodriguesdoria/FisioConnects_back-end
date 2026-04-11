@@ -6,8 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { IUserLogin } from 'src/shared/interfaces/loginUser.interface';
 import { comparePassword } from 'src/utils/hashPassword';
 import { OtpService } from 'src/otp/otp.service';
-import * as bcrypt from 'bcrypt';
-
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +60,7 @@ createToken(user: User) {
       if(!user){
         throw new NotFoundException("Usuário não encontrado. Por favor verifique os dados inseridos")
       }
-      const isValidPassword = await comparePassword(password, user.password);
+      const isValidPassword = await comparePassword(user.password, password);
       if(!isValidPassword){
         throw new UnauthorizedException("Senha incorreta")
       }
@@ -107,7 +106,7 @@ createToken(user: User) {
       throw new BadRequestException('Usuário não encontrado')
     }
     //criptografa a nova senha e atualiza a entidade do usuário
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = await argon2.hash(newPassword);
     await this._userRepository.save(user);
     
     return 'Senha redefinida com sucesso!!!'
