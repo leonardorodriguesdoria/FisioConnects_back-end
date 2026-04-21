@@ -3,12 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { hashPassword } from 'src/utils/hashPassword';
-import { ICreateUser } from 'src/shared/interfaces/createUser.interface';
+import { ICreateUser } from 'src/shared/interfaces/user_interfaces/createUser.interface';
 import { OtpService } from 'src/otp/otp.service';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
-import { IUpdateUserProfile } from 'src/shared/interfaces/updateUser.interface';
+import { IUpdateUserProfile } from 'src/shared/interfaces/user_interfaces/updateUser.interface';
 
 @Injectable()
 export class UserService {
@@ -22,7 +22,7 @@ export class UserService {
 
   async createUser(body:ICreateUser): Promise<void>{
     try{
-      const { name, email, phone, description, password, crefito, specialties } = body;
+      const { name, email, phone, description , city , password, crefito, specialties } = body;
       
       const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
 
@@ -46,6 +46,7 @@ export class UserService {
         email: email,
         phone: phone,
         description: description,
+        city: city,
         password: hashedPassword,
         crefito: crefito,
         specialties: specialties

@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { OTP } from './otp/entities/otp.entity';
 import { EmailModule } from './email/email.module';
+import { FilterModule } from './filter/filter.module';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { EmailModule } from './email/email.module';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DB_HOST'),
-        port: +configService.get('DB_PORT'),
+        port: Number(configService.get('DB_PORT')),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
@@ -44,6 +45,7 @@ import { EmailModule } from './email/email.module';
     UserModule,
     OtpModule,
     EmailModule,
+    FilterModule,
   ],
   controllers: [AppController],
   providers: [

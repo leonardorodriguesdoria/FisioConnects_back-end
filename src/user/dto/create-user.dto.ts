@@ -21,6 +21,10 @@ export class CreateUserDto {
     @IsNotEmpty()
     description: string;
 
+    @IsString()
+    @IsNotEmpty()
+    city: string;
+
     @IsOptional()
     profilePicture?: string;
 

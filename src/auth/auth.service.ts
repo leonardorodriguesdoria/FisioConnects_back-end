@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { IUserLogin } from 'src/shared/interfaces/loginUser.interface';
+import { IUserLogin } from 'src/shared/interfaces/user_interfaces/loginUser.interface';
 import { comparePassword } from 'src/utils/hashPassword';
 import { OtpService } from 'src/otp/otp.service';
 import * as argon2 from 'argon2';

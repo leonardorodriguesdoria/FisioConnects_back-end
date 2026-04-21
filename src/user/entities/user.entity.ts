@@ -20,13 +20,16 @@ export class User {
   @Column({ unique: true })
   crefito: string;
 
+  @Column({nullable: false})
+  city: string;
+
   @Column()
   description: string;
 
   @Column({ default: 'https://ibb.co/27mgpNMx' })
   profilePicture: string;
 
-  @Column('simple-array')
+  @Column("text", {array: true})
   specialties: string[];
 
   @Column({ nullable: true })

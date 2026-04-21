@@ -5,6 +5,7 @@ export interface ICreateUser {
   phone: string;
   password: string;
   description: string;
+  city: string;
   profilePicture?: string;
   crefito: string;
   specialties: string[];
