@@ -6,6 +6,7 @@ import { RequestTokenDTO } from './dto/request-token.dto';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserInterceptor } from 'src/interceptors/interceptor';
 
 @Controller('user')
 export class UserController {
@@ -44,13 +45,14 @@ export class UserController {
   /*------------------------------------------------------------------------------------------- */
   /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
 
-
+  @UseInterceptors(UserInterceptor)
   @Get()
   async listUsers(){
     return await this.userService.getAllUsers()
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(UserInterceptor)
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number){
     return this.userService.getOneUser(id);
@@ -59,7 +61,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image'), UserInterceptor)
   async updateProfile(
     @Body() uptateUserDto: UpdateUserDto,
     @UploadedFile() image: Express.Multer.File,

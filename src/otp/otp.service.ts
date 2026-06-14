@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from 'src/user/entities/user.entity';
 import { OtpTypes } from './types/otpType';
-import { hashOTP } from 'src/utils/hashPassword';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 

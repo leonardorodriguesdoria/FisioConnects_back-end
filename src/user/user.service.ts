@@ -104,11 +104,7 @@ export class UserService {
       throw new NotFoundException("Nenhum usuário encontrado em nossos registros");
     }
 
-    const sanitizedUsers = users.map(
-      ({ password, resetToken, resetTokenExpiresAt, accountStatus, ...rest }) => rest
-    );
-
-    return sanitizedUsers;
+    return users;
   }
 
   async getOneUser(id: number){
@@ -117,8 +113,7 @@ export class UserService {
       if(!user){
         throw new NotFoundException("Usuário não encontrado")
       }
-      const {password,resetToken,resetTokenExpiresAt,accountStatus, ...rest} = user;
-      return rest
+      return user;
     }catch(error){
       throw new InternalServerErrorException("Erro interno no sistema. Por favor, tente mais tarde")
     }
@@ -144,9 +139,7 @@ export class UserService {
 
       const updatedUser = await this._userRepository.save(user);
 
-      const {password,resetToken,resetTokenExpiresAt,accountStatus, ...response } = updatedUser;
-
-      return response;
+      return updatedUser;
     }catch(error){
       throw new InternalServerErrorException(
         'Erro interno do sistema. Por favor tente mais tarde',
