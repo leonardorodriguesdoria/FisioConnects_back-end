@@ -12,6 +12,10 @@ import { User } from './user/entities/user.entity';
 import { OTP } from './otp/entities/otp.entity';
 import { EmailModule } from './email/email.module';
 import { FilterModule } from './filter/filter.module';
+import { Patient } from './user/patients/entities/patient.entity';
+import { MedicalRecord } from './user/entities/medicalRecord.entity';
+import { Evolution } from './user/patients/entities/evolution.entity';
+import { PatientsModule } from './user/patients/patients.module';
 
 
 @Module({
@@ -35,7 +39,7 @@ import { FilterModule } from './filter/filter.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [User, OTP],
+        entities: [User, OTP, Patient, MedicalRecord, Evolution],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,
       }),
@@ -46,6 +50,7 @@ import { FilterModule } from './filter/filter.module';
     OtpModule,
     EmailModule,
     FilterModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [

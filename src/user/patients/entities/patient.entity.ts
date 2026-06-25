@@ -11,20 +11,17 @@ export class Patient {
     name: string;
 
     @Column({nullable: false})
-    age: number;
-
-    @Column({nullable: false})
     birthday: Date
 
     @Column()
     gender: string;
 
-    @Column()
+    @Column({unique: true})
     phone: string;
 
     @Column()
     email:string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, user => user.patients)
     professional: User;
 }

@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Patient } from '../patients/entities/patient.entity';
 
 @Entity('usuário')
 export class User {
-@PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
@@ -11,7 +12,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({unique: true})
   phone: string;
 
   @Column()
@@ -40,4 +41,7 @@ export class User {
 
   @Column({ default: 'unverified' })
   accountStatus: 'verified' | 'unverified';
+
+  @OneToMany(() => Patient, patient => patient.professional)
+  patients: Patient[]
 }
