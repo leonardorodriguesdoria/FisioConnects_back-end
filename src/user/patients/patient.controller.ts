@@ -1,7 +1,7 @@
 import { Body, Controller, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreatePatientDto } from './dto/create-patient.dto';
 
 @UseGuards(JwtAuthGuard)

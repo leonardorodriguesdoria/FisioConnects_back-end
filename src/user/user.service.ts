@@ -2,7 +2,7 @@ import { ConflictException, Injectable, InternalServerErrorException, NotFoundEx
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { hashPassword } from 'src/utils/hashPassword';
+import { hashPassword } from 'src/common/utils/hashPassword';
 import { ICreateUser } from 'src/shared/interfaces/user_interfaces/createUser.interface';
 import { OtpService } from 'src/otp/otp.service';
 import { OtpTypes } from 'src/otp/types/otpType';

@@ -4,7 +4,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { IUserLogin } from 'src/shared/interfaces/user_interfaces/loginUser.interface';
-import { comparePassword } from 'src/utils/hashPassword';
+import { comparePassword } from 'src/common/utils/hashPassword';
 import { OtpService } from 'src/otp/otp.service';
 import * as argon2 from 'argon2';
 
@@ -52,7 +52,6 @@ createToken(user: User) {
     }
   }
 
-  //Login Usuário
   async userLogin(body: IUserLogin){
     try{
       const {email, password, otp} = body
@@ -93,19 +92,19 @@ createToken(user: User) {
     if(!user){
       throw new UnauthorizedException("Usuário não encontrado")
     }
-    //Se o código é válido, a conta é verificada
     user.accountStatus = 'verified'
     return await this._userRepository.save(user);
   }
 
-  //Função de redefinição de senha
+  
   async resetPassword(token: string, newPassword: string): Promise<string>{
     const userId = await this._otpService.validateResetPassword(token)
     const user = await this._userRepository.findOne({where: {id: userId}});
+    
     if(!user){
       throw new BadRequestException('Usuário não encontrado')
     }
-    //criptografa a nova senha e atualiza a entidade do usuário
+    
     user.password = await argon2.hash(newPassword);
     await this._userRepository.save(user);
     

@@ -4,9 +4,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestTokenDTO } from './dto/request-token.dto';
 import { OtpTypes } from 'src/otp/types/otpType';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UserInterceptor } from 'src/interceptors/interceptor';
+import { UserInterceptor } from 'src/common/interceptors/interceptor';
 
 @Controller('user')
 export class UserController {

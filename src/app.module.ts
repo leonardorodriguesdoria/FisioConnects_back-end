@@ -11,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { OTP } from './otp/entities/otp.entity';
 import { EmailModule } from './email/email.module';
-import { FilterModule } from './filter/filter.module';
+import { FilterModule } from './common/filter/filter.module';
 import { Patient } from './user/patients/entities/patient.entity';
 import { MedicalRecord } from './user/entities/medicalRecord.entity';
 import { Evolution } from './user/patients/entities/evolution.entity';
