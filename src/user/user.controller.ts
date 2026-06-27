@@ -81,6 +81,7 @@ export class UserController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteProfile(@Param('id', ParseIntPipe) id: number){
     await this.userService.deleteUser(id);

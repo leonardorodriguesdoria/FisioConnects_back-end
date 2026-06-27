@@ -13,7 +13,7 @@ export class JwtAuthGuard implements CanActivate {
         const authHeader = request.headers.authorization
 
         if(!authHeader){
-            throw new UnauthorizedException('Nenhum token fornecido. Usuário não autorizado')
+            throw new UnauthorizedException('AÇÃO NÃO AUTORIZADA')
         }
 
         const token = authHeader.split(' ')[1];
