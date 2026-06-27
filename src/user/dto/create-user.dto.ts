@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsOptional, IsStrongPassword, IsArray, ArrayNotEmpty, Validate } from "class-validator";
-import { IsCrefitoValidConstraint } from "src/common/utils/crefitoDecorator.decorator";
+import { IsCrefitoValidConstraint } from "src/common/decorators/crefitoDecorator.decorator";
 
 export class CreateUserDto {
     @IsNotEmpty({ message: 'O campo de nome é obrigatório' })

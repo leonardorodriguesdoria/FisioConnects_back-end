@@ -3,9 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Patient } from "./entities/patient.entity";
 import { Repository } from "typeorm";
 import { IPatient } from "src/shared/interfaces/patient_interface/patient_interface";
-import { MedicalRecord } from "../entities/medicalRecord.entity";
+import { MedicalRecord } from "../user/entities/medicalRecord.entity";
 import { IMedicalRecord } from "src/shared/interfaces/medical_record_interface/medical_record.interface";
-import { User } from "../entities/user.entity";
+import { User } from "../user/entities/user.entity";
 
 @Injectable()
 export class PatientService {
