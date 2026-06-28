@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsOptional, IsStrongPassword, IsArray, ArrayNotEmpty, Validate } from "class-validator";
+import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsOptional, IsStrongPassword, IsArray, ArrayNotEmpty, Validate, IsPhoneNumber } from "class-validator";
 import { IsCrefitoValidConstraint } from "src/common/decorators/crefitoDecorator.decorator";
 
 export class CreateUserDto {
@@ -13,8 +13,8 @@ export class CreateUserDto {
     @MaxLength(100, { message: 'O e-mail deve ter no máximo 100 caracteres' })
     email: string;
 
-    @IsString({ message: 'O campo de telefone é obrigatório' })
-    @IsNotEmpty()
+    @IsNotEmpty({ message: 'O campo de telefone é obrigatório' })
+    @IsPhoneNumber()
     phone: string;
 
     @IsString()

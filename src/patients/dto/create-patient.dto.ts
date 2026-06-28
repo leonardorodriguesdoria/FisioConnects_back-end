@@ -16,7 +16,7 @@ export class CreatePatientDto {
     gender:string;
 
     @IsNotEmpty({message: "Insira o telefone do paciente"})
-    @IsPhoneNumber('BR')
+    @IsPhoneNumber()
     phone:string;
 
     @IsNotEmpty({message: "Insira o email do paciente"})
