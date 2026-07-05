@@ -1,4 +1,4 @@
-import {IsDateString, IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from "class-validator";
+import {IsDateString, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 
 export class CreatePatientDto {
@@ -22,4 +22,19 @@ export class CreatePatientDto {
     @IsNotEmpty({message: "Insira o email do paciente"})
     @IsEmail({}, {message: "Insira um e-mail válido"})
     email:string;
+
+    @IsNotEmpty({message: "O campo endereço não pode ser vazio"})
+    @IsString({message: "Insira um endereço válido"})
+    address: string;
+
+    @IsNotEmpty({message: "O campo da profissão não pode ser vazio"})
+    @IsString({message: "Insira um nome de profissão válido"})
+    profession: string;
+
+    @IsNotEmpty({message: "Informe a nacionalidade do paciente"})
+    @IsString({message: "Insira um nome de nacionalidade válida"})
+    nationality: string;
+
+    @IsOptional()
+    picture?: string;
 }

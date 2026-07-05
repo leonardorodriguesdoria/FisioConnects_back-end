@@ -1,5 +1,7 @@
 export interface IMedicalRecord {
+    date: string;
+    chiefComplain: string;
     diagnosis: string;
-    plan?: string;
+    treatmentPlan: string;
     observations?: string;
 }

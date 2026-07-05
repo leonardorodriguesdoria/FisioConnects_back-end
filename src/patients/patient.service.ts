@@ -20,7 +20,7 @@ export class PatientService {
 
     async registerPatient(userId: number,body: IPatient) {
         try {
-            const { name,birthday, gender, phone, email } = body;
+            const { name,birthday, gender, phone, email, address, profession, nationality, picture } = body;
 
             const patientAlreadyExists = await this._patientRepository.findOne({
                 where: { email, professional: {id: userId} }
@@ -42,6 +42,10 @@ export class PatientService {
                 gender: gender, 
                 phone: phone,
                 email: email,
+                address: address,
+                profession: profession,
+                nationality: nationality,
+                picture: picture,
                 professional: professional
             });
             return await this._patientRepository.save(newPatient);
@@ -61,10 +65,12 @@ export class PatientService {
             }
 
             const newMedicalRecord = this._medicalRecordRepository.create({
+                date: body.date,
+                chiefComplaint: body.chiefComplain,
                 diagnosis: body.diagnosis,
-                plan: body.plan,
+                treatmentPlan: body.treatmentPlan,
                 observations: body.observations,
-                patient
+                patient,
             });
 
             return await this._medicalRecordRepository.save(newMedicalRecord);
