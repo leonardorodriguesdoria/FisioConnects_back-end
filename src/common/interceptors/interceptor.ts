@@ -29,7 +29,8 @@ export class UserInterceptor implements NestInterceptor{
             password,
             resetToken,
             resetTokenExpiresAt,
-            accountStatus, 
+            accountStatus,
+            createdAt, 
             ...rest
         } = user;
 

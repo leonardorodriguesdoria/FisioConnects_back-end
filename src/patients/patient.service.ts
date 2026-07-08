@@ -54,6 +54,17 @@ export class PatientService {
         }
     }
 
+    async getAllPatients(userId: number): Promise<Partial<Patient>[]>{
+        const patients = await this._patientRepository.find({where: {professional: {id: userId}}});
+
+        if(patients.length == 0){
+            throw new NotFoundException("Nenhum paciente cadastrado")
+        }
+        return patients;
+    }
+
+    /*-----------------FUNÇÕES DE GERENCIAMENTO DE PRONTUÁRIO---------------*/
+
     async registerMedicalRecord(patientId: number, body: IMedicalRecord): Promise<MedicalRecord> {
         try {
             const patient = await this._patientRepository.findOne({
