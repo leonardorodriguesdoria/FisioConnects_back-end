@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Patient } from "./entities/patient.entity";
 import { Repository } from "typeorm";
@@ -61,6 +61,18 @@ export class PatientService {
             throw new NotFoundException("Nenhum paciente cadastrado")
         }
         return patients;
+    }
+
+    async getPatient(userId: number, patientId: number){
+        try{
+            const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+            if(!patient){
+                throw new NotFoundException("Paciente não encontrado")
+            }
+            return patient;
+        }catch(error){
+            throw new InternalServerErrorException("Erro Interno do sistema.Por favor, tente mais tarde")
+        }
     }
 
     /*-----------------FUNÇÕES DE GERENCIAMENTO DE PRONTUÁRIO---------------*/

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -17,9 +17,20 @@ export class PatientController {
     }
 
     @UseInterceptors(UserInterceptor)
-    @Get(':id')
-    async listAllPatients(@Param('id', ParseIntPipe) id: number){
-        return this.patientService.getAllPatients(id);
+    @Get()
+    async listAllPatients(
+        @Req() request
+    ){
+        return this.patientService.getAllPatients(request.user.id);
+    }
+
+    @UseInterceptors(UserInterceptor)
+    @Get(':patientId')
+    async getOnePatient(
+        @Req() requision,
+        @Param('patientId', ParseIntPipe) patientId: number
+    ){
+        return this.patientService.getPatient(requision.user.id, patientId);
     }
 
     @Post('medical-records/:id')
