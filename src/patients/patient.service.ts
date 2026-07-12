@@ -6,6 +6,7 @@ import { IPatient } from "src/shared/interfaces/patient_interface/patient_interf
 import { MedicalRecord } from "../user/entities/medicalRecord.entity";
 import { IMedicalRecord } from "src/shared/interfaces/medical_record_interface/medical_record.interface";
 import { User } from "../user/entities/user.entity";
+import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/updateUser.interface";
 
 @Injectable()
 export class PatientService {
@@ -72,6 +73,29 @@ export class PatientService {
             return patient;
         }catch(error){
             throw new InternalServerErrorException("Erro Interno do sistema.Por favor, tente mais tarde")
+        }
+    }
+
+
+    async updatePatient(userId: number, patientId: number, body: IUpdateUserInterface){
+        try{
+            const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+            if(!patient){
+                throw new NotFoundException("Usuário não encontrado!!!!")
+            }
+            if(body.email && body.email !== patient.email){
+                const emailInUse = await this._userRepository.findOne({
+                where: {email: body.email}
+            });
+            if(emailInUse){
+                    throw new ConflictException("Este e-mail já está sendo usado por outro usuário");
+                }
+            }
+            Object.assign(patient, body);
+            const updatedPatient = await this._patientRepository.save(patient);
+            return updatedPatient; 
+        }catch(error){
+            throw new InternalServerErrorException("Erro no sistema. Por favor tente novamente mais tarde")
         }
     }
 

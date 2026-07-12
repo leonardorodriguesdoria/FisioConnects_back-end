@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UserInterceptor } from 'src/common/interceptors/interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('patients')
@@ -31,6 +33,23 @@ export class PatientController {
         @Param('patientId', ParseIntPipe) patientId: number
     ){
         return this.patientService.getPatient(requision.user.id, patientId);
+    }
+
+    @Patch('update/:patientId')
+    @UseInterceptors(FileInterceptor('image'))
+    async updatePatientProfile(
+        @Req() request,
+        @Param('patientId', ParseIntPipe) patientId: number,
+        @Body() body: UpdatePatientDto,
+        @UploadedFile() image: Express.Multer.File
+    ){
+        if(image){
+            body.picture = image.path
+        }
+        const updatePatientProfile = await this.patientService.updatePatient(request.user.id, patientId, body);
+        return {
+            message: 'Perfil do paciente atualizado com sucesso',
+        };
     }
 
     @Post('medical-records/:id')
