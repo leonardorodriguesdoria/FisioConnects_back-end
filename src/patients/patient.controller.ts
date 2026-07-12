@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -50,6 +50,15 @@ export class PatientController {
         return {
             message: 'Perfil do paciente atualizado com sucesso',
         };
+    }
+
+    @Delete(':patientId')
+    async deletePatientProfile(
+        @Req() request,
+        @Param('patientId', ParseIntPipe) patientId: number,
+    ){
+        await this.patientService.deletePatient(request.user.id, patientId);
+        return {message: 'Perfil do paciente excluído com sucesso'}
     }
 
     @Post('medical-records/:id')

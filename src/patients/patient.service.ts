@@ -99,6 +99,15 @@ export class PatientService {
         }
     }
 
+    async deletePatient(userId: number, patientId: number){
+        const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+        if(!patient){
+            throw new NotFoundException("Ocorreu um erro inesperado. Perfil do paciente não foi encontrado!!!")
+        }
+        await this._patientRepository.delete(patientId);
+        return true;
+    }
+
     /*-----------------FUNÇÕES DE GERENCIAMENTO DE PRONTUÁRIO---------------*/
 
     async registerMedicalRecord(patientId: number, body: IMedicalRecord): Promise<MedicalRecord> {
