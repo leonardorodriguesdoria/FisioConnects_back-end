@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { MedicalRecord } from "src/user/entities/medicalRecord.entity";
+import { MedicalRecord } from "src/medical_record/entities/medicalRecord.entity";
 
 @Entity('evolução')
 export class Evolution{

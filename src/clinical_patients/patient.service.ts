@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Patient } from "./entities/patient.entity";
 import { Repository } from "typeorm";
 import { IPatient } from "src/shared/interfaces/patient_interface/patient_interface";
-import { MedicalRecord } from "../user/entities/medicalRecord.entity";
+import { MedicalRecord } from "../medical_record/entities/medicalRecord.entity";
 import { IMedicalRecord } from "src/shared/interfaces/medical_record_interface/medical_record.interface";
 import { User } from "../user/entities/user.entity";
 import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/updateUser.interface";

@@ -12,10 +12,12 @@ import { User } from './user/entities/user.entity';
 import { OTP } from './otp/entities/otp.entity';
 import { EmailModule } from './email/email.module';
 import { FilterModule } from './common/filter/filter.module';
-import { Patient } from './patients/entities/patient.entity';
-import { MedicalRecord } from './user/entities/medicalRecord.entity';
-import { Evolution } from './patients/entities/evolution.entity';
-import { PatientsModule } from './patients/patients.module';
+import { Patient } from './clinical_patients/entities/patient.entity';
+import { MedicalRecord } from './medical_record/entities/medicalRecord.entity';
+import { Evolution } from './clinical_patients/entities/evolution.entity';
+import { PatientsModule } from './clinical_patients/patients.module';
+import { ProfessionalModule } from './professional/professional.module';
+import { MedicalRecordModule } from './medical_record/medical_record.module';
 
 
 @Module({
@@ -51,6 +53,8 @@ import { PatientsModule } from './patients/patients.module';
     EmailModule,
     FilterModule,
     PatientsModule,
+    ProfessionalModule,
+    MedicalRecordModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "../../user/entities/user.entity";
-import { MedicalRecord } from "src/user/entities/medicalRecord.entity";
+import { MedicalRecord } from "src/medical_record/entities/medicalRecord.entity";
+import { Professional } from "src/professional/entities/professional.entity";
 
-@Entity('paciente')
-export class Patient {
+@Entity('paciente_clinico')
+export class ClinicalPatient {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -38,9 +38,9 @@ export class Patient {
     @CreateDateColumn()
     createdAt: Date;
 
-    @ManyToOne(() => User, user => user.patients, {onDelete: 'CASCADE'})
-    professional: User;
+    @ManyToOne(() => Professional, professional => professional.patients, {onDelete: 'CASCADE'})
+    professional: Professional;
 
     @OneToMany(() => MedicalRecord, medicalRecord => medicalRecord.patient)
-    medicalRecord: MedicalRecord[]
+    medicalRecord: MedicalRecord[];
 }

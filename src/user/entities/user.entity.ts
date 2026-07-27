@@ -1,5 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Patient } from '../../patients/entities/patient.entity';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserTypes } from '../types/UserTypes.enum';
 
 @Entity('usuário')
 export class User {
@@ -18,20 +18,14 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ unique: true })
-  crefito: string;
-
-  @Column({nullable: false})
-  city: string;
-
-  @Column()
-  description: string;
+  @Column({
+        type: 'enum',
+        enum: UserTypes
+  })
+  role: UserTypes;
 
   @Column({ default: 'https://ibb.co/27mgpNMx' })
   profilePicture: string;
-
-  @Column("text", {array: true})
-  specialties: string[];
 
   @Column({ nullable: true })
   resetToken: string;
@@ -42,6 +36,6 @@ export class User {
   @Column({ default: 'unverified' })
   accountStatus: 'verified' | 'unverified';
 
-  @OneToMany(() => Patient, patient => patient.professional)
-  patients: Patient[]
+  @CreateDateColumn()
+  createdAt: Date;
 }
