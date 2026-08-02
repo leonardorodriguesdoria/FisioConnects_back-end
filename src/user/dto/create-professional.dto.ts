@@ -1,7 +1,8 @@
-import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsOptional, IsStrongPassword, IsArray, ArrayNotEmpty, Validate, IsPhoneNumber } from "class-validator";
+import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsPhoneNumber, IsStrongPassword, Validate, IsOptional, IsArray, ArrayNotEmpty } from "class-validator";
 import { IsCrefitoValidConstraint } from "src/common/decorators/crefitoDecorator.decorator";
 
-export class CreateUserDto {
+export class CreateProfessionalDto {
+
     @IsNotEmpty({ message: 'O campo de nome é obrigatório' })
     @IsString({ message: 'Por favor, insira um nome válido' })
     @MinLength(3, { message: 'O nome deve ter pelo menos 3 caracteres' })
@@ -12,14 +13,29 @@ export class CreateUserDto {
     @IsEmail({}, { message: 'Por favor, insira um endereço de email válido' })
     @MaxLength(100, { message: 'O e-mail deve ter no máximo 100 caracteres' })
     email: string;
-
+    
     @IsNotEmpty({ message: 'O campo de telefone é obrigatório' })
     @IsPhoneNumber()
     phone: string;
 
-    @IsString()
-    @IsNotEmpty()
-    description: string;
+    @IsNotEmpty({ message: 'O campo de senha é obrigatório' })
+    @IsStrongPassword(
+        {
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minSymbols: 1,
+        },
+        {
+            message:
+            'A senha deve ter no minímo 6 caracteres, incluindo: 1 letra maiúscula, 1 letra minúscula, e 1 caractere especial',
+        },
+    )
+    password:string;
+
+    @IsNotEmpty({ message: 'É necessário informar o seu CREFITO' })
+    @Validate(IsCrefitoValidConstraint)
+    crefito: string;
 
     @IsString()
     @IsNotEmpty()
@@ -28,26 +44,11 @@ export class CreateUserDto {
     @IsOptional()
     profilePicture?: string;
 
-    @IsNotEmpty({ message: 'O campo de senha é obrigatório' })
-    @IsStrongPassword(
-    {
-        minLength: 6,
-        minLowercase: 1,
-        minUppercase: 1,
-        minSymbols: 1,
-    },
-    {
-        message:
-        'A senha deve ter no minímo 6 caracteres, incluindo: 1 letra maiúscula, 1 letra minúscula, e 1 caractere especial',
-    },
-    )
-    password: string;
-
-    @IsNotEmpty({ message: 'É necessário informar o seu CREFITO' })
-    @Validate(IsCrefitoValidConstraint)
-    crefito: string;
-
     @IsArray()
     @ArrayNotEmpty()
     specialties: string[];
+
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 }

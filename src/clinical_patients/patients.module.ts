@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Patient } from './entities/patient.entity';
+import { ClinicalPatient } from './entities/patient.entity';
 import { MedicalRecord } from '../medical_record/entities/medicalRecord.entity';
 import { PatientService } from './patient.service';
 import { PatientController } from './patient.controller';
@@ -22,7 +22,7 @@ import { extname } from 'path';
                 callback(null, filename);
             },
         }),
-    }),TypeOrmModule.forFeature([Patient, MedicalRecord, User]),JwtModule],
+    }),TypeOrmModule.forFeature([ClinicalPatient, MedicalRecord, User]),JwtModule],
     controllers: [PatientController],
     providers: [PatientService],
     exports: [PatientService]

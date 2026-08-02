@@ -11,6 +11,8 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ConfigModule} from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ProfessionalModule } from 'src/professional/professional.module';
+import { Professional } from 'src/professional/entities/professional.entity';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { JwtModule } from '@nestjs/jwt';
           callback(null, filename);
         },
       }),
-    }),TypeOrmModule.forFeature([User]), OtpModule, EmailModule, ConfigModule, JwtModule],
+    }),TypeOrmModule.forFeature([User, Professional]), OtpModule, EmailModule, ConfigModule, JwtModule, ProfessionalModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]

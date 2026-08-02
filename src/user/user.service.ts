@@ -3,40 +3,66 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { hashPassword } from 'src/common/utils/hashPassword';
-import { ICreateUser } from 'src/shared/interfaces/user_interfaces/createUser.interface';
 import { OtpService } from 'src/otp/otp.service';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { IUpdateUserProfile } from 'src/shared/interfaces/user_interfaces/updateUser.interface';
+import { ICreatePatient } from 'src/shared/interfaces/user_interfaces/createPatient.interface';
+import { ICreateProfessional } from 'src/shared/interfaces/user_interfaces/createProfessional.interface';
+import { Professional } from 'src/professional/entities/professional.entity';
+import { UserTypes } from './types/UserTypes.enum';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) 
     private readonly _userRepository: Repository<User>,
+
+    @InjectRepository(Professional)
+    private readonly _professionalRepository: Repository<Professional>,
+
     private readonly _otpService: OtpService,
     private readonly _emailService: EmailService,
     private readonly _configService: ConfigService
   ){}
 
-  async createUser(body:ICreateUser): Promise<void>{
-    try{
-      const { name, email, phone, description , city , password, crefito, specialties } = body;
+  async createPatient(body:ICreatePatient): Promise<void>{
+      const {email , password } = body;
       
       const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
 
-      //Verifica se existe algum usuário que já está usando o e-mail informado
       if(userAlreadyExists){
         throw new ConflictException("Já existe um usuário cadastrado com esse e-mail!!!")
       }
 
-      const userWithCrefito = await this._userRepository.findOne({where: {crefito: crefito}})
+      const hashedPassword = await hashPassword(password)
 
-      if(userWithCrefito){
+      const newPatient = this._userRepository.create({
+        email: email,
+        password: hashedPassword,
+        role: UserTypes.PATIENT
+      });
+
+      await this._userRepository.save(newPatient);
+      return this.emailVerification(newPatient, OtpTypes.OTP)
+  }
+
+  async createProfessional(body: ICreateProfessional): Promise<void>{
+      const {name, email, phone, password, crefito,city, specialties, description} = body;
+
+      const userAlreadyExists =await this._userRepository.findOne({where:{email: email}});
+
+      if(userAlreadyExists){
         throw new ConflictException(
-          'Já existe um usuário cadastrado com esse CREFITO',
+            "Já existe um usuário cadastrado com esse e-mail."
         );
+      }
+
+      const professionalWithCrefito = await this._professionalRepository.findOne({where: {crefito: crefito}});
+
+      if(professionalWithCrefito){
+        throw new ConflictException("Já existe um profissional cadastrado com esse CREFITO")
       }
 
       const hashedPassword = await hashPassword(password)
@@ -45,22 +71,23 @@ export class UserService {
         name: name,
         email: email,
         phone: phone,
-        description: description,
-        city: city,
         password: hashedPassword,
-        crefito: crefito,
-        specialties: specialties
-      })
+        role: UserTypes.PROFESSIONAL
+      });
+
       await this._userRepository.save(newUser);
+
+      const newProfessional = this._professionalRepository.create({
+        crefito:crefito,
+        city: city,
+        description: description,
+        specialties: specialties,
+        user: newUser
+      })
+
+      await this._professionalRepository.save(newProfessional);
+
       return this.emailVerification(newUser, OtpTypes.OTP)
-    }catch(error){
-    if (error.code === '23505') {
-      throw new ConflictException(
-        'E-mail ou CREFITO já cadastrado',
-      );
-    }
-      throw error;
-    }
   }
 
   //Enviar código de verificação o link de reset via email

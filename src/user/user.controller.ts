@@ -1,21 +1,28 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestTokenDTO } from './dto/request-token.dto';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserInterceptor } from 'src/common/interceptors/interceptor';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { CreateProfessionalDto } from './dto/create-professional.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('register')
-  async registerNewUser(@Body() userDto: CreateUserDto){
-    await this.userService.createUser(userDto);
-    return{message: "Usuário cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
+  @Post('register/patient')
+  async registerNewPatient(@Body() userDto: CreatePatientDto){
+    await this.userService.createPatient(userDto);
+    return{message: "Paciente cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
+  }
+
+  @Post('register/professional')
+  async registerNewProfessional(@Body() userDto: CreateProfessionalDto){
+    await this.userService.createProfessional(userDto);
+    return{message: "Profissional cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
   }
 
   @Post('request-otp')
@@ -57,7 +64,6 @@ export class UserController {
   async getUser(@Param('id', ParseIntPipe) id: number){
     return this.userService.getOneUser(id);
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')

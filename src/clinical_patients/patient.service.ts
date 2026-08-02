@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Patient } from "./entities/patient.entity";
+import { ClinicalPatient } from "./entities/patient.entity";
 import { Repository } from "typeorm";
 import { IPatient } from "src/shared/interfaces/patient_interface/patient_interface";
 import { MedicalRecord } from "../medical_record/entities/medicalRecord.entity";
@@ -11,8 +11,8 @@ import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/up
 @Injectable()
 export class PatientService {
     constructor(
-        @InjectRepository(Patient)
-        private readonly _patientRepository: Repository<Patient>,
+        @InjectRepository(ClinicalPatient)
+        private readonly _patientRepository: Repository<ClinicalPatient>,
         @InjectRepository(MedicalRecord)
         private readonly _medicalRecordRepository: Repository<MedicalRecord>,
         @InjectRepository(User)
@@ -55,7 +55,7 @@ export class PatientService {
         }
     }
 
-    async getAllPatients(userId: number): Promise<Partial<Patient>[]>{
+    async getAllPatients(userId: number): Promise<Partial<ClinicalPatient>[]>{
         const patients = await this._patientRepository.find({where: {professional: {id: userId}}});
 
         if(patients.length == 0){

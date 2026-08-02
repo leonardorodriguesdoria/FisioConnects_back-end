@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { User } from "../../user/entities/user.entity";
 import { ClinicalPatient } from "src/clinical_patients/entities/patient.entity";
 
-@Entity('professional')
+@Entity('profissional')
 export class Professional {
 
     @PrimaryGeneratedColumn()

@@ -12,12 +12,13 @@ import { User } from './user/entities/user.entity';
 import { OTP } from './otp/entities/otp.entity';
 import { EmailModule } from './email/email.module';
 import { FilterModule } from './common/filter/filter.module';
-import { Patient } from './clinical_patients/entities/patient.entity';
+import { ClinicalPatient } from './clinical_patients/entities/patient.entity';
 import { MedicalRecord } from './medical_record/entities/medicalRecord.entity';
 import { Evolution } from './clinical_patients/entities/evolution.entity';
 import { PatientsModule } from './clinical_patients/patients.module';
 import { ProfessionalModule } from './professional/professional.module';
 import { MedicalRecordModule } from './medical_record/medical_record.module';
+import { Professional } from './professional/entities/professional.entity';
 
 
 @Module({
@@ -41,7 +42,7 @@ import { MedicalRecordModule } from './medical_record/medical_record.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [User, OTP, Patient, MedicalRecord, Evolution],
+        entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,
       }),
