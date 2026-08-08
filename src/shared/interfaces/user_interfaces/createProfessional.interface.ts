@@ -3,7 +3,6 @@ export interface ICreateProfessional {
     email:string;
     phone:string;
     password:string;
-    crefito:string;
     city:string;
     profilePicture?:string;
     specialties: string[];

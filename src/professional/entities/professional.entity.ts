@@ -8,8 +8,8 @@ export class Professional {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true })
-    crefito: string;
+    @Column({unique: true})
+    phone: string;
 
     @Column()
     description: string;

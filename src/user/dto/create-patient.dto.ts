@@ -1,6 +1,9 @@
-import { IsNotEmpty, IsEmail, IsStrongPassword } from "class-validator";
+import { IsNotEmpty, IsEmail, IsStrongPassword, IsString } from "class-validator";
 
 export class CreatePatientDto {
+    @IsString({message: 'Insira um nome válido'})
+    @IsNotEmpty({ message: 'O campo de nome é obrigatório' })
+    name:string;
 
     @IsNotEmpty({ message: 'O campo de e-mail é obrigatório' })
     @IsEmail({}, { message: 'Por favor, insira um endereço de email válido' })

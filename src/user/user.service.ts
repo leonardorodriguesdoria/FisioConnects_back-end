@@ -28,7 +28,7 @@ export class UserService {
   ){}
 
   async createPatient(body:ICreatePatient): Promise<void>{
-      const {email , password } = body;
+      const {name ,email , password } = body;
       
       const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
 
@@ -39,6 +39,7 @@ export class UserService {
       const hashedPassword = await hashPassword(password)
 
       const newPatient = this._userRepository.create({
+        name: name,
         email: email,
         password: hashedPassword,
         role: UserTypes.PATIENT
@@ -49,7 +50,7 @@ export class UserService {
   }
 
   async createProfessional(body: ICreateProfessional): Promise<void>{
-      const {name, email, phone, password, crefito,city, specialties, description} = body;
+      const {name, email, phone, password,city, specialties, description} = body;
 
       const userAlreadyExists =await this._userRepository.findOne({where:{email: email}});
 
@@ -59,18 +60,11 @@ export class UserService {
         );
       }
 
-      const professionalWithCrefito = await this._professionalRepository.findOne({where: {crefito: crefito}});
-
-      if(professionalWithCrefito){
-        throw new ConflictException("Já existe um profissional cadastrado com esse CREFITO")
-      }
-
       const hashedPassword = await hashPassword(password)
 
       const newUser = this._userRepository.create({
         name: name,
         email: email,
-        phone: phone,
         password: hashedPassword,
         role: UserTypes.PROFESSIONAL
       });
@@ -78,7 +72,7 @@ export class UserService {
       await this._userRepository.save(newUser);
 
       const newProfessional = this._professionalRepository.create({
-        crefito:crefito,
+        phone: phone,
         city: city,
         description: description,
         specialties: specialties,

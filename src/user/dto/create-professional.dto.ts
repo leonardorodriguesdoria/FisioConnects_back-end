@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString, MinLength, MaxLength, IsEmail, IsPhoneNumber, IsStrongPassword, Validate, IsOptional, IsArray, ArrayNotEmpty } from "class-validator";
-import { IsCrefitoValidConstraint } from "src/common/decorators/crefitoDecorator.decorator";
 
 export class CreateProfessionalDto {
 
@@ -32,10 +31,6 @@ export class CreateProfessionalDto {
         },
     )
     password:string;
-
-    @IsNotEmpty({ message: 'É necessário informar o seu CREFITO' })
-    @Validate(IsCrefitoValidConstraint)
-    crefito: string;
 
     @IsString()
     @IsNotEmpty()
