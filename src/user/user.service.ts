@@ -119,13 +119,26 @@ export class UserService {
   /*FUNÇÕES DE CRUD DE PERFIL DO USUÁRIOS */
 
   async getAllUsers(): Promise<Partial<User>[]> {
-    const users = await this._userRepository.find();
+    const professionals = await this._professionalRepository.find({
+        relations: {
+            user: true
+        }
+    });
 
-    if (users.length === 0) {
-      throw new NotFoundException("Nenhum usuário encontrado em nossos registros");
+    if (professionals.length === 0) {
+        throw new NotFoundException(
+            'Nenhum profissional encontrado em nossos registros'
+        );
     }
 
-    return users;
+    return professionals.map(professional => ({
+        name: professional.user.name,
+        description: professional.description,
+        specialties: professional.specialties,
+        city: professional.city,
+        phone: professional.phone,
+        profilePicture: professional.user.profilePicture
+    }));
   }
 
   async getOneUser(id: number){
