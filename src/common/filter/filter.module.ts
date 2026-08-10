@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { FilterService } from './filter.service';
 import { FilterController } from './filter.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { Professional } from 'src/professional/entities/professional.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([Professional])],
   controllers: [FilterController],
   providers: [FilterService],
 })

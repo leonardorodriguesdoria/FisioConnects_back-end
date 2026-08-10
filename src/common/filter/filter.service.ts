@@ -1,47 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { IFilter } from 'src/shared/interfaces/filterInterface/filter.interface';
+import { Professional } from 'src/professional/entities/professional.entity';
 
 @Injectable()
 export class FilterService {
-  constructor(@InjectRepository(User) private readonly _userRepository: Repository<User>){}
+  constructor(
+    @InjectRepository(Professional) 
+    private readonly _professionalRepository: Repository<Professional>
+  ){}
 
 
   async findAll(filters: IFilter){
     const {name, specialties, city} = filters;
 
-    const query = this._userRepository
-    .createQueryBuilder('user')
+    const query = this._professionalRepository
+    .createQueryBuilder('professional')
+    .leftJoinAndSelect('professional.user', 'user')
     .select([
-    'user.id',
-    'user.name',
-    'user.email',
-    'user.phone',
-    'user.description',
-    'user.crefito',
-    'user.city',
-    'user.profilePicture',
-    'user.specialties'
+      'professional.id',
+      'professional.phone',
+      'professional.description',
+      'professional.city',
+      'professional.specialties',
+
+      'user.name',
+      'user.profilePicture',
     ]);
 
-    if(name){
-      query.andWhere('LOWER(user.name) LIKE LOWER(:name)', {
-        name: `%${name}%`
-      })
+    if (name?.trim()) {
+      query.andWhere('user.name ILIKE :name', {
+          name: `%${name.trim()}%`
+      });
     }
 
-    if(city?.trim()){
-      query.andWhere('user.city ILIKE :city', {
-        city: `%${city.trim()}%`
-      })
+    if (city?.trim()) {
+      query.andWhere('professional.city ILIKE :city', {
+          city: `%${city.trim()}%`
+      });
     }
 
     if(specialties?.length){
-      query.andWhere('user.specialties && :specialties', {
-        specialties
-      })
+      query.andWhere('professional.specialties && ARRAY[:...specialties]',{specialties})
     }
 
     return query.getMany();
