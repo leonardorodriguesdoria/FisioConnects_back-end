@@ -169,15 +169,39 @@ export class UserService {
           );
         }
       }
-      Object.assign(user, body);
+      Object.assign(user, {
+        name: body.name,
+        email: body.email,
+        profilePicture: body.profilePicture
+      });
 
       const updatedUser = await this._userRepository.save(user);
+      
+      let updatedProfessional: Professional | null = null;
 
-      return updatedUser;
+      if(user.role === UserTypes.PROFESSIONAL){
+        const professional = await this._professionalRepository.findOne({where: {user: {id: user.id}}});
+
+        if(!professional){
+          throw new NotFoundException("Perfil profissional não encontrado")
+        }
+
+        Object.assign(professional, {
+          phone: body.phone,
+          description: body.description,
+          specialties: body.specialties,
+          city: body.city
+        })
+
+        updatedProfessional = await this._professionalRepository.save(professional)
+      }
+
+      return {user: updatedUser, professional: updatedProfessional};
     }catch(error){
-      throw new InternalServerErrorException(
-        'Erro interno do sistema. Por favor tente mais tarde',
-      );
+      if(error instanceof NotFoundException || error instanceof ConflictException){
+        throw error
+      }
+      throw new InternalServerErrorException("Erro interno no sistema. Por favor, tente mais tarde")
     }
   }
 

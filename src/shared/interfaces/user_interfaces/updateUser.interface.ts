@@ -3,6 +3,7 @@ export interface IUpdateUserProfile{
     email?: string;
     phone?: string;
     description?: string;
+    city?: string;
     profilePicture?: string;
     specialties?: string[];
 }

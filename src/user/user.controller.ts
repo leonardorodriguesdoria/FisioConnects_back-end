@@ -76,14 +76,11 @@ export class UserController {
     if (image) {
       uptateUserDto.profilePicture = image.path
     }
-    const updateProfile = await this.userService.updateUser(
-      id,
-      uptateUserDto
-    );
+    
+    await this.userService.updateUser(id,uptateUserDto);
 
     return {
       message: 'Dados do perfil atualizados com sucesso!!!',
-      updateProfile,
     };
   }
 

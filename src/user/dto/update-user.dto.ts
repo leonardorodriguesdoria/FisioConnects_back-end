@@ -24,6 +24,11 @@ export class UpdateUserDto {
 
     @IsOptional()
     @IsString()
+    @MaxLength(50)
+    city?:string;
+
+    @IsOptional()
+    @IsString()
     profilePicture?: string;
 
     @IsOptional()
