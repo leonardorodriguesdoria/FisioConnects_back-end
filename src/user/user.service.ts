@@ -60,6 +60,12 @@ export class UserService {
         );
       }
 
+      const phoneAlreadySaved = await this._professionalRepository.findOne({where: {phone: phone}})
+      
+      if(phoneAlreadySaved){
+        throw new ConflictException("Esse número de telefone já se encontra cadastrado")
+      }
+
       const hashedPassword = await hashPassword(password)
 
       const newUser = this._userRepository.create({
