@@ -6,24 +6,24 @@ import { ClinicalPatient } from "src/clinical_patients/entities/patient.entity";
 export class Professional {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
-    @Column({unique: true})
-    phone: string;
+    @Column({ unique: true })
+    phone!: string;
 
     @Column()
-    description: string;
+    description!: string;
 
-    @Column("text", {array: true})
-    specialties: string[];
+    @Column("text", { array: true })
+    specialties!: string[];
 
-    @Column({nullable: false})
-    city: string;
+    @Column({ nullable: false })
+    city!: string;
 
-    @OneToOne(() => User)
+    @OneToOne(() => User, user => user.professional, { onDelete: 'CASCADE' })
     @JoinColumn()
-    user: User;
+    user!: User;
 
     @OneToMany(() => ClinicalPatient, patient => patient.professional)
-    patients: ClinicalPatient[];
+    patients!: ClinicalPatient[];
 }

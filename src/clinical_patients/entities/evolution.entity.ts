@@ -5,14 +5,14 @@ import { MedicalRecord } from "src/medical_record/entities/medicalRecord.entity"
 export class Evolution{
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
-    @Column({nullable: false})
-    description: string;
+    @Column({ nullable: false })
+    description!: string;
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt!: Date;
 
-    @ManyToOne(() => MedicalRecord, medicalRecord => medicalRecord.patient)
-    medicalRecord: MedicalRecord;
+    @ManyToOne(() => MedicalRecord, medicalRecord => medicalRecord.patient, { onDelete: 'CASCADE' })
+    medicalRecord!: MedicalRecord;
 }
