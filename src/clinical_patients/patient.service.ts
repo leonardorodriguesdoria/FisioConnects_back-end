@@ -7,10 +7,13 @@ import { MedicalRecord } from "../medical_record/entities/medicalRecord.entity";
 import { IMedicalRecord } from "src/shared/interfaces/medical_record_interface/medical_record.interface";
 import { User } from "../user/entities/user.entity";
 import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/updateUser.interface";
+import { Professional } from "src/professional/entities/professional.entity";
 
 @Injectable()
 export class PatientService {
     constructor(
+        @InjectRepository(Professional)
+        private readonly _professionalRepository: Repository<Professional>,
         @InjectRepository(ClinicalPatient)
         private readonly _patientRepository: Repository<ClinicalPatient>,
         @InjectRepository(MedicalRecord)
@@ -56,11 +59,18 @@ export class PatientService {
     }
 
     async getAllPatients(userId: number): Promise<Partial<ClinicalPatient>[]>{
-        const patients = await this._patientRepository.find({where: {professional: {id: userId}}});
+        const professional = await this._professionalRepository.findOne({where: {user: {id: userId}}});
 
-        if(patients.length == 0){
-            throw new NotFoundException("Nenhum paciente cadastrado")
+        if(!professional){
+            throw new NotFoundException("Profissional não encontrado")
         }
+
+        const patients = await this._patientRepository.find({where: {professional: {id: professional.id}}})
+
+        if (patients.length === 0) {
+            throw new NotFoundException("Nenhum paciente cadastrado");
+        }
+
         return patients;
     }
 

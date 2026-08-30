@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { Professional } from 'src/professional/entities/professional.entity';
 
 @Module({
     imports: [
@@ -22,7 +23,7 @@ import { extname } from 'path';
                 callback(null, filename);
             },
         }),
-    }),TypeOrmModule.forFeature([ClinicalPatient, MedicalRecord, User]),JwtModule],
+    }),TypeOrmModule.forFeature([ClinicalPatient, MedicalRecord, User, Professional]),JwtModule],
     controllers: [PatientController],
     providers: [PatientService],
     exports: [PatientService]
