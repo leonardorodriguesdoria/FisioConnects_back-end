@@ -61,8 +61,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(UserInterceptor)
   @Get(':id')
-  async getUser(@Param('id', ParseIntPipe) id: number){
-    return this.userService.getOneUser(id);
+  async getUser(@Req() request){
+    return this.userService.getOneUser(request.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -85,9 +85,9 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async deleteProfile(@Param('id', ParseIntPipe) id: number){
-    await this.userService.deleteUser(id);
+  @Delete()
+  async deleteProfile(@Req() request){
+    await this.userService.deleteUser(request.user.id);
     return{message: 'Conta deleteda com sucesso!!!'}
   }
 }
