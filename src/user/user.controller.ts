@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe, UseGuards, UploadedFile, UseInterceptors, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestTokenDTO } from './dto/request-token.dto';
@@ -66,18 +66,18 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('update/:id')
+  @Patch('update')
   @UseInterceptors(FileInterceptor('image'), UserInterceptor)
   async updateProfile(
     @Body() uptateUserDto: UpdateUserDto,
     @UploadedFile() image: Express.Multer.File,
-    @Param('id', ParseIntPipe) id: number
+    @Req() request,
   ){
     if (image) {
       uptateUserDto.profilePicture = image.path
     }
     
-    await this.userService.updateUser(id,uptateUserDto);
+    await this.userService.updateUser(request.user.id,uptateUserDto);
 
     return {
       message: 'Dados do perfil atualizados com sucesso!!!',
