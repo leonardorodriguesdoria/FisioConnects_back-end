@@ -1,34 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { MedicalRecordService } from './medical_record.service';
 import { CreateMedicalRecordDto } from './dto/create-medical_record.dto';
 import { UpdateMedicalRecordDto } from './dto/update-medical_record.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('medical-record')
 export class MedicalRecordController {
   constructor(private readonly medicalRecordService: MedicalRecordService) {}
 
-  @Post()
-  create(@Body() createMedicalRecordDto: CreateMedicalRecordDto) {
-    return this.medicalRecordService.create(createMedicalRecordDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.medicalRecordService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicalRecordService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMedicalRecordDto: UpdateMedicalRecordDto) {
-    return this.medicalRecordService.update(+id, updateMedicalRecordDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.medicalRecordService.remove(+id);
+  @Post('register/:publicId')
+  async registerMedicalRecord(
+    @Body() 
+    createMedicalRecordDto: CreateMedicalRecordDto,
+    @Req()
+    request,
+    @Param(':publicId') 
+    publicId: string
+  ){
+    await this.medicalRecordService.createMedicalRecord(request.user.id, createMedicalRecordDto, publicId);
+    return {message: "Prontuário cadastrado com sucesso!!!"}
   }
 }
