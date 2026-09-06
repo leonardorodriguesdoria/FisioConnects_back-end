@@ -8,6 +8,7 @@ import { IMedicalRecord } from "src/shared/interfaces/medical_record_interface/m
 import { User } from "../user/entities/user.entity";
 import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/updateUser.interface";
 import { Professional } from "src/professional/entities/professional.entity";
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class PatientService {
@@ -40,7 +41,8 @@ export class PatientService {
                 throw new NotFoundException("Houve um problema ao carregar seu perfil")
             }
 
-            const newPatient = this._patientRepository.create({ 
+            const newPatient = this._patientRepository.create({
+                publicId: nanoid(), 
                 name: name,
                 birthday: birthday, 
                 gender: gender, 
@@ -74,9 +76,18 @@ export class PatientService {
         return patients;
     }
 
-    async getPatient(userId: number, patientId: number){
+    async getPatient(userId: number, publicId: string){
         try{
-            const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+            const patient = await this._patientRepository.findOne({
+                where:{
+                    publicId,
+                    professional:{
+                        user:{
+                            id: userId
+                        }
+                    }
+                }
+            });
             if(!patient){
                 throw new NotFoundException("Paciente não encontrado")
             }
@@ -87,9 +98,18 @@ export class PatientService {
     }
 
 
-    async updatePatient(userId: number, patientId: number, body: IUpdateUserInterface){
+    async updatePatient(userId: number, publicId: string, body: IUpdateUserInterface){
         try{
-            const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+            const patient = await this._patientRepository.findOne({
+                where:{
+                    publicId,
+                    professional:{
+                        user:{
+                            id: userId
+                        }
+                    }
+                }
+            });
             if(!patient){
                 throw new NotFoundException("Usuário não encontrado!!!!")
             }
@@ -109,12 +129,21 @@ export class PatientService {
         }
     }
 
-    async deletePatient(userId: number, patientId: number){
-        const patient = await this._patientRepository.findOne({where: {professional: {id: userId}, id: patientId}})
+    async deletePatient(userId: number, publicId: string){
+        const patient = await this._patientRepository.findOne({
+            where:{
+                publicId,
+                professional:{
+                    user:{
+                        id: userId
+                    }
+                }
+            }
+        })
         if(!patient){
             throw new NotFoundException("Ocorreu um erro inesperado. Perfil do paciente não foi encontrado!!!")
         }
-        await this._patientRepository.delete(patientId);
+        await this._patientRepository.remove(patient);
         return true;
     }
 

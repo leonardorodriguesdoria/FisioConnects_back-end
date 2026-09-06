@@ -8,6 +8,9 @@ export class ClinicalPatient {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column({unique: true, length: 21})
+    publicId!: string;
+
     @Column({ nullable: false })
     name!: string;
 

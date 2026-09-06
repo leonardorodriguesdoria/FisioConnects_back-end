@@ -12,9 +12,11 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 export class PatientController {
     constructor(private readonly patientService: PatientService) {}
 
-    @Post('register/:id')
-    async registerPatient(@Body() body: CreatePatientDto, @Param('id', ParseIntPipe) id: number) {
-        await this.patientService.registerPatient(id,body);
+    @Post('register')
+    async registerPatient(
+        @Body() body: CreatePatientDto, 
+        @Req() request) {
+        await this.patientService.registerPatient(request.user.id,body);
         return { message: 'Paciente cadastrado com sucesso!' };
     }
 
@@ -27,37 +29,37 @@ export class PatientController {
     }
 
     @UseInterceptors(UserInterceptor)
-    @Get(':patientId')
+    @Get(':publicId')
     async getOnePatient(
-        @Req() requision,
-        @Param('patientId', ParseIntPipe) patientId: number
+        @Req() request,
+        @Param('publicId') publicId: string
     ){
-        return this.patientService.getPatient(requision.user.id, patientId);
+        return this.patientService.getPatient(request.user.id, publicId);
     }
 
-    @Patch('update/:patientId')
+    @Patch('update/:publicId')
     @UseInterceptors(FileInterceptor('image'))
     async updatePatientProfile(
         @Req() request,
-        @Param('patientId', ParseIntPipe) patientId: number,
+        @Param('publicId') publicId: string,
         @Body() body: UpdatePatientDto,
         @UploadedFile() image: Express.Multer.File
     ){
         if(image){
             body.picture = image.path
         }
-        const updatePatientProfile = await this.patientService.updatePatient(request.user.id, patientId, body);
+        const updatePatientProfile = await this.patientService.updatePatient(request.user.id, publicId, body);
         return {
             message: 'Perfil do paciente atualizado com sucesso',
         };
     }
 
-    @Delete(':patientId')
+    @Delete(':publicId')
     async deletePatientProfile(
         @Req() request,
-        @Param('patientId', ParseIntPipe) patientId: number,
+        @Param('publicId') publicId: string,
     ){
-        await this.patientService.deletePatient(request.user.id, patientId);
+        await this.patientService.deletePatient(request.user.id, publicId);
         return {message: 'Perfil do paciente excluído com sucesso'}
     }
 
