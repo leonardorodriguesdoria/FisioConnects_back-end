@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { OtpModule } from 'src/otp/otp.module';
 import { EmailModule } from 'src/email/email.module';
-import { UserIdCheckMiddleware } from 'src/common/middlewares/user-id-check.middleware';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -33,21 +32,4 @@ import { Professional } from 'src/professional/entities/professional.entity';
   providers: [UserService],
   exports: [UserService]
 })
-export class UserModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserIdCheckMiddleware).forRoutes(
-      {
-        path: 'user/:id',
-        method: RequestMethod.GET
-      },
-      {
-        path: 'user/update/:id',
-        method: RequestMethod.PATCH
-      },
-      { 
-        path: 'user/:id', 
-        method: RequestMethod.DELETE 
-      }
-    )
-  }
-}
+export class UserModule{}
