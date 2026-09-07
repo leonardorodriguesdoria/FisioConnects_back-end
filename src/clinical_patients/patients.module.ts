@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClinicalPatient } from './entities/patient.entity';
-import { MedicalRecord } from '../medical_record/entities/medicalRecord.entity';
 import { PatientService } from './patient.service';
 import { PatientController } from './patient.controller';
 import { User } from '../user/entities/user.entity';
@@ -23,7 +22,7 @@ import { Professional } from 'src/professional/entities/professional.entity';
                 callback(null, filename);
             },
         }),
-    }),TypeOrmModule.forFeature([ClinicalPatient, MedicalRecord, User, Professional]),JwtModule],
+    }),TypeOrmModule.forFeature([ClinicalPatient,User, Professional]),JwtModule],
     controllers: [PatientController],
     providers: [PatientService],
     exports: [PatientService]

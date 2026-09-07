@@ -48,7 +48,7 @@ export class PatientController {
         if(image){
             body.picture = image.path
         }
-        const updatePatientProfile = await this.patientService.updatePatient(request.user.id, publicId, body);
+        await this.patientService.updatePatient(request.user.id, publicId, body);
         return {
             message: 'Perfil do paciente atualizado com sucesso',
         };
@@ -61,16 +61,5 @@ export class PatientController {
     ){
         await this.patientService.deletePatient(request.user.id, publicId);
         return {message: 'Perfil do paciente excluído com sucesso'}
-    }
-
-    @Post('medical-records/:id')
-    async registerMedicalRecord(
-        @Param('id', ParseIntPipe) patientId: number,
-        @Body() body: CreateMedicalRecordDto
-    ) {
-        await this.patientService.registerMedicalRecord(patientId, body);
-        return {
-            message: 'Prontuário registrado com sucesso!'
-        };
     }
 }

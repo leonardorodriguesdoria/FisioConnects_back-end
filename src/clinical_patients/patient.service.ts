@@ -17,8 +17,6 @@ export class PatientService {
         private readonly _professionalRepository: Repository<Professional>,
         @InjectRepository(ClinicalPatient)
         private readonly _patientRepository: Repository<ClinicalPatient>,
-        @InjectRepository(MedicalRecord)
-        private readonly _medicalRecordRepository: Repository<MedicalRecord>,
         @InjectRepository(User)
         private readonly _userRepository: Repository<User>
     ) {}
@@ -145,32 +143,5 @@ export class PatientService {
         }
         await this._patientRepository.remove(patient);
         return true;
-    }
-
-    /*-----------------FUNÇÕES DE GERENCIAMENTO DE PRONTUÁRIO---------------*/
-
-    async registerMedicalRecord(patientId: number, body: IMedicalRecord): Promise<MedicalRecord> {
-        try {
-            const patient = await this._patientRepository.findOne({
-                where: { id: patientId }
-            });
-
-            if (!patient) {
-                throw new NotFoundException("Paciente não encontrado");
-            }
-
-            const newMedicalRecord = this._medicalRecordRepository.create({
-                date: body.date,
-                chiefComplaint: body.chiefComplain,
-                diagnosis: body.diagnosis,
-                treatmentPlan: body.treatmentPlan,
-                observations: body.observations,
-                patient,
-            });
-
-            return await this._medicalRecordRepository.save(newMedicalRecord);
-        } catch (error) {
-            throw error;
-        }
     }
 }
