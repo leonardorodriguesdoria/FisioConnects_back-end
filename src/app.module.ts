@@ -19,6 +19,7 @@ import { PatientsModule } from './clinical_patients/patients.module';
 import { ProfessionalModule } from './professional/professional.module';
 import { MedicalRecordModule } from './medical_record/medical_record.module';
 import { Professional } from './professional/entities/professional.entity';
+import { PatientModule } from './patient/patient.module';
 
 
 @Module({
@@ -56,6 +57,7 @@ import { Professional } from './professional/entities/professional.entity';
     PatientsModule,
     ProfessionalModule,
     MedicalRecordModule,
+    PatientModule,
   ],
   controllers: [AppController],
   providers: [

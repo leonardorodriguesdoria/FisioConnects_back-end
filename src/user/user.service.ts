@@ -2,14 +2,7 @@ import { ConflictException, Injectable, InternalServerErrorException, NotFoundEx
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { hashPassword } from 'src/common/utils/hashPassword';
-import { OtpService } from 'src/otp/otp.service';
-import { OtpTypes } from 'src/otp/types/otpType';
-import { EmailService } from 'src/email/email.service';
-import { ConfigService } from '@nestjs/config';
 import { IUpdateUserProfile } from 'src/shared/interfaces/user_interfaces/updateUser.interface';
-import { ICreatePatient } from 'src/shared/interfaces/user_interfaces/createPatient.interface';
-import { ICreateProfessional } from 'src/shared/interfaces/user_interfaces/createProfessional.interface';
 import { Professional } from 'src/professional/entities/professional.entity';
 import { UserTypes } from './types/UserTypes.enum';
 
@@ -22,105 +15,7 @@ export class UserService {
     @InjectRepository(Professional)
     private readonly _professionalRepository: Repository<Professional>,
 
-    private readonly _otpService: OtpService,
-    private readonly _emailService: EmailService,
-    private readonly _configService: ConfigService
   ){}
-
-  async createPatient(body:ICreatePatient): Promise<void>{
-      const {name ,email , password } = body;
-      
-      const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
-
-      if(userAlreadyExists){
-        throw new ConflictException("Já existe um usuário cadastrado com esse e-mail!!!")
-      }
-
-      const hashedPassword = await hashPassword(password)
-
-      const newPatient = this._userRepository.create({
-        name: name,
-        email: email,
-        password: hashedPassword,
-        role: UserTypes.PATIENT
-      });
-
-      await this._userRepository.save(newPatient);
-      return this.emailVerification(newPatient, OtpTypes.OTP)
-  }
-
-  async createProfessional(body: ICreateProfessional): Promise<void>{
-      const {name, email, phone, password,city, specialties, description} = body;
-
-      const userAlreadyExists =await this._userRepository.findOne({where:{email: email}});
-
-      if(userAlreadyExists){
-        throw new ConflictException(
-            "Já existe um usuário cadastrado com esse e-mail."
-        );
-      }
-
-      const phoneAlreadySaved = await this._professionalRepository.findOne({where: {phone: phone}})
-      
-      if(phoneAlreadySaved){
-        throw new ConflictException("Esse número de telefone já se encontra cadastrado")
-      }
-
-      const hashedPassword = await hashPassword(password)
-
-      const newUser = this._userRepository.create({
-        name: name,
-        email: email,
-        password: hashedPassword,
-        role: UserTypes.PROFESSIONAL
-      });
-
-      await this._userRepository.save(newUser);
-
-      const newProfessional = this._professionalRepository.create({
-        phone: phone,
-        city: city,
-        description: description,
-        specialties: specialties,
-        user: newUser
-      })
-
-      await this._professionalRepository.save(newProfessional);
-
-      return this.emailVerification(newUser, OtpTypes.OTP)
-  }
-
-  //Enviar código de verificação o link de reset via email
-  async emailVerification(user: User, otpType: OtpTypes){
-    const token = await this._otpService.generateToken(user, otpType)
-
-    if(otpType === OtpTypes.OTP){
-      const emailDto = {
-      recipients: [user.email],
-      subject: "Código para verificação de conta",
-      html: `Seu código de verificação de conta é: <strong>${token}</strong>`
-    }
-
-    //Envia código de verificação para o e-mail
-    return await this._emailService.sendEmail(emailDto)
-  }else if(otpType === OtpTypes.RESET_LINK){
-    const resetLink = `${this._configService.get('RESET_PASSWORD_URL')}?token=${token}`
-    const emailDto = {
-      recipients: [user.email],
-      subject: "Link de redefinição de senha",
-      html: `Clique no link a seguir para redefinir sua senha: <p><a href="${resetLink}">Redefinir Senha</a></p>`
-    };
-
-    //Envia o link de redefinição de senha via e-mail
-    return await this._emailService.sendEmail(emailDto)
-  }
-}
-
-  //Verifica se o e-mail informado está cadastrado para requisição de um novo código de verificação
-  async findByEmail(email: string){
-    return await this._userRepository.findOne({where: {email: email}})
-  }
-
 /*------------------------------------------------------------------------------------------- */
   /*FUNÇÕES DE CRUD DE PERFIL DO USUÁRIOS */
 

@@ -4,11 +4,11 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-vali
 export class LoginUserDto {
   @IsEmail({}, { message: 'Por favor insira um endereço de e-mail válido!!!' })
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6, { message: 'Senha de login deve ter no minímo 6 caracteres' })
-  password: string;
+  password!: string;
 
   @IsOptional()
   @IsString()

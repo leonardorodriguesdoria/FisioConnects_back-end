@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { OtpModule } from 'src/otp/otp.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { OtpModule } from 'src/otp/otp.module';
         secret: configService.get<string>('JWT_SECRET_LOGIN'),
       }),
       inject: [ConfigService],
-    }),],
+    }),EmailModule, ConfigModule],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService]
 })
 export class AuthModule {}

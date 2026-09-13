@@ -6,16 +6,16 @@ export class CreateProfessionalDto {
     @IsString({ message: 'Por favor, insira um nome válido' })
     @MinLength(3, { message: 'O nome deve ter pelo menos 3 caracteres' })
     @MaxLength(50, { message: 'O nome deve ter no máximo 50 caracteres' })
-    name: string;
+    name!: string;
 
     @IsNotEmpty({ message: 'O campo de e-mail é obrigatório' })
     @IsEmail({}, { message: 'Por favor, insira um endereço de email válido' })
     @MaxLength(100, { message: 'O e-mail deve ter no máximo 100 caracteres' })
-    email: string;
+    email!: string;
     
     @IsNotEmpty({ message: 'O campo de telefone é obrigatório' })
     @IsPhoneNumber()
-    phone: string;
+    phone!: string;
 
     @IsNotEmpty({ message: 'O campo de senha é obrigatório' })
     @IsStrongPassword(
@@ -26,24 +26,23 @@ export class CreateProfessionalDto {
             minSymbols: 1,
         },
         {
-            message:
-            'A senha deve ter no minímo 6 caracteres, incluindo: 1 letra maiúscula, 1 letra minúscula, e 1 caractere especial',
-        },
+            message: 'A senha deve ter no minímo 6 caracteres, incluindo: 1 letra maiúscula, 1 letra minúscula, e 1 caractere especial',
+        }
     )
-    password:string;
+    password!: string;
 
     @IsString()
     @IsNotEmpty()
-    city: string;
+    city!: string;
 
     @IsOptional()
     profilePicture?: string;
 
     @IsArray()
     @ArrayNotEmpty()
-    specialties: string[];
+    specialties!: string[];
 
     @IsString()
     @IsNotEmpty()
-    description: string;
+    description!: string;
 }

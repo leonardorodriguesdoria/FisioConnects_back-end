@@ -27,7 +27,7 @@ import { Professional } from 'src/professional/entities/professional.entity';
           callback(null, filename);
         },
       }),
-    }),TypeOrmModule.forFeature([User, Professional]), OtpModule, EmailModule, ConfigModule, JwtModule, ProfessionalModule],
+    }),TypeOrmModule.forFeature([User, Professional]), JwtModule, ProfessionalModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]
