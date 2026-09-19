@@ -8,6 +8,9 @@ export class MedicalRecord{
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column({unique: true, nullable: false})
+    publicId!: string;
+
     @Column({ nullable: false })
     date!: Date;
 

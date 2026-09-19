@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateMedicalRecordDto } from './dto/update-medical_record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MedicalRecord } from './entities/medicalRecord.entity';
 import { IMedicalRecord } from 'src/shared/interfaces/medical_record_interface/medical_record.interface';
 import { ClinicalPatient } from 'src/clinical_patients/entities/patient.entity';
-import { Professional } from 'src/professional/entities/professional.entity';
+import { nanoid } from 'nanoid'; 
 
 @Injectable()
 export class MedicalRecordService {
@@ -32,6 +31,7 @@ export class MedicalRecordService {
         throw new NotFoundException("Paciente não encontrado ou não pertence ao profissional autenticado.")
       }
       const newMedicalRecord = this._medicalRecordRepository.create({
+        publicId: nanoid(),
         date: date,
         chiefComplaint: chiefComplain,
         diagnosis: diagnosis,

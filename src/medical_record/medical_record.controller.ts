@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { MedicalRecordService } from './medical_record.service';
 import { CreateMedicalRecordDto } from './dto/create-medical_record.dto';
-import { UpdateMedicalRecordDto } from './dto/update-medical_record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
