@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { MedicalRecord } from "src/medical_record/entities/medicalRecord.entity";
 
-@Entity('evolução')
+@Entity('evolucao')
 export class Evolution{
 
     @PrimaryGeneratedColumn()
@@ -13,6 +13,6 @@ export class Evolution{
     @CreateDateColumn()
     createdAt!: Date;
 
-    @ManyToOne(() => MedicalRecord, medicalRecord => medicalRecord.patient, { onDelete: 'CASCADE' })
+    @ManyToOne(() => MedicalRecord, medicalRecord => medicalRecord.evolution, { onDelete: 'CASCADE' })
     medicalRecord!: MedicalRecord;
 }

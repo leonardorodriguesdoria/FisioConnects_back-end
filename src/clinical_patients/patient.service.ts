@@ -7,6 +7,9 @@ import { User } from "../user/entities/user.entity";
 import { IUpdateUserInterface } from "src/shared/interfaces/patient_interface/updateUser.interface";
 import { Professional } from "src/professional/entities/professional.entity";
 import { nanoid } from "nanoid";
+import { IEvolution } from "src/shared/interfaces/evoution_interface/evolution.interface";
+import { MedicalRecord } from "src/medical_record/entities/medicalRecord.entity";
+import { Evolution } from "./entities/evolution.entity";
 
 @Injectable()
 export class PatientService {
@@ -16,7 +19,13 @@ export class PatientService {
         @InjectRepository(ClinicalPatient)
         private readonly _patientRepository: Repository<ClinicalPatient>,
         @InjectRepository(User)
-        private readonly _userRepository: Repository<User>
+        private readonly _userRepository: Repository<User>,
+
+        @InjectRepository(MedicalRecord)
+        private readonly _medicalRecordRepository: Repository<MedicalRecord>,
+
+        @InjectRepository(Evolution)
+        private readonly _evolutionRepository: Repository<Evolution>
     ) {}
 
     async registerPatient(userId: number,body: IPatient) {
@@ -148,5 +157,44 @@ export class PatientService {
         }
         await this._patientRepository.remove(patient);
         return true;
+    }
+
+    /******=======EVOLUÇÃO DO QUADRO DO PACIENTE=========*/
+    async patientEvolution(userId: number,medicalRecordId:number,body: IEvolution){
+        const {description} = body;
+
+        const professional = await this._professionalRepository.findOne({
+            where:{
+                user:{
+                    id: userId
+                }
+            }
+        });
+
+        if(!professional){
+            throw new NotFoundException("Houve um problema ao carregar seu perfil")
+        }
+
+        const medicalRecord = await this._medicalRecordRepository.findOne({
+            where:{
+                id: medicalRecordId,
+                patient: {
+                    professional:{
+                        id: professional.id
+                    }
+                }
+            }
+        })
+
+        if(!medicalRecord){
+            throw new NotFoundException("Prontuário não encontrado ou não pertence ao profissional");
+        }
+
+        const evolution = this._evolutionRepository.create({
+            description: description,
+            medicalRecord: medicalRecord
+        })
+
+        return await this._evolutionRepository.save(evolution);
     }
 }
