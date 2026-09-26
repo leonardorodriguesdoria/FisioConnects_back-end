@@ -160,7 +160,7 @@ export class PatientService {
     }
 
     /******=======EVOLUÇÃO DO QUADRO DO PACIENTE=========*/
-    async patientEvolution(userId: number,medicalRecordId:number,body: IEvolution){
+    async patientEvolution(userId: number,medicalRecordPublicId:string,body: IEvolution){
         const {description} = body;
 
         const professional = await this._professionalRepository.findOne({
@@ -177,7 +177,7 @@ export class PatientService {
 
         const medicalRecord = await this._medicalRecordRepository.findOne({
             where:{
-                id: medicalRecordId,
+                publicId: medicalRecordPublicId,
                 patient: {
                     professional:{
                         id: professional.id

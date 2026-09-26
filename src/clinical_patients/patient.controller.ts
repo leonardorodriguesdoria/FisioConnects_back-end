@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PatientService } from './patient.service';
-import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UserInterceptor } from 'src/common/interceptors/interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { CreateEvolutionDto } from './dto/create-evolution.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('patients')
@@ -61,5 +61,17 @@ export class PatientController {
     ){
         await this.patientService.deletePatient(request.user.id, publicId);
         return {message: 'Perfil do paciente excluído com sucesso'}
+    }
+
+    /**ENDPOINTS DE EVOLUÇÃO DE QUADRO DO PACIENTES */
+
+    @Post(':publicId/evolutions')
+    async registerEvolution(
+        @Req() request,
+        @Param('publicId') publicId: string,
+        @Body() body: CreateEvolutionDto
+    ){
+        await this.patientService.patientEvolution(request.user.id, publicId, body);
+        return {message: 'Evolução registrada com sucesso'}
     }
 }
