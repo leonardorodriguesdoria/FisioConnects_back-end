@@ -74,4 +74,13 @@ export class PatientController {
         await this.patientService.patientEvolution(request.user.id, publicId, body);
         return {message: 'Evolução registrada com sucesso'}
     }
+
+    @UseInterceptors(UserInterceptor)
+    @Get(':publicId/evolutions')
+    async getEvolutions(
+        @Req() request,
+        @Param('publicId') publicId: string
+    ){
+        return this.patientService.listEvolutions(request.user.id, publicId);
+    } 
 }

@@ -197,4 +197,50 @@ export class PatientService {
 
         return await this._evolutionRepository.save(evolution);
     }
+
+    async listEvolutions(userId: number,medicalRecordPublicId:string){
+        const professional = await this._professionalRepository.findOne({
+            where: {
+            user: {
+                id: userId,
+                },
+            },
+        });
+
+        if (!professional) {
+            throw new NotFoundException('Houve um problema ao carregar seu perfil');
+        }
+
+        const medicalRecord = await this._medicalRecordRepository.findOne({
+            where: {
+            publicId: medicalRecordPublicId,
+            patient: {
+                professional: {
+                id: professional.id,
+                    },
+                },
+            },
+        });
+
+        if(!medicalRecord){
+            throw new NotFoundException('Prontuário não encontrado')
+        }
+
+        const evolutions = await this._evolutionRepository.find({
+            where: {
+            medicalRecord: {
+                id: medicalRecord.id,
+                },
+            },
+            order: {
+            createdAt: 'ASC',
+            },
+        });
+
+        if(evolutions.length === 0){
+            throw new NotFoundException('Nenhuma evolução encontrada para este prontuário')
+        }
+
+        return evolutions;
+    }
 }
