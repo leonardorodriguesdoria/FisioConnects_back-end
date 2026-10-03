@@ -20,6 +20,8 @@ import { ProfessionalModule } from './professional/professional.module';
 import { MedicalRecordModule } from './medical_record/medical_record.module';
 import { Professional } from './professional/entities/professional.entity';
 import { PatientModule } from './patient/patient.module';
+import { EvaluationModule } from './evaluation/evaluation.module';
+import { Evaluation } from './evaluation/entities/evaluation.entity';
 
 
 @Module({
@@ -43,7 +45,7 @@ import { PatientModule } from './patient/patient.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional],
+        entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional, Evaluation],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,
       }),
@@ -58,6 +60,7 @@ import { PatientModule } from './patient/patient.module';
     ProfessionalModule,
     MedicalRecordModule,
     PatientModule,
+    EvaluationModule,
   ],
   controllers: [AppController],
   providers: [

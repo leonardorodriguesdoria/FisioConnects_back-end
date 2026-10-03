@@ -1,12 +1,16 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../user/entities/user.entity";
 import { ClinicalPatient } from "src/clinical_patients/entities/patient.entity";
+import { Evaluation } from "src/evaluation/entities/evaluation.entity";
 
 @Entity('profissional')
 export class Professional {
 
     @PrimaryGeneratedColumn()
     id!: number;
+
+    @Column({unique: true, nullable: false})
+    publicId!:string;
 
     @Column({ unique: true })
     phone!: string;
@@ -26,4 +30,7 @@ export class Professional {
 
     @OneToMany(() => ClinicalPatient, patient => patient.professional)
     patients!: ClinicalPatient[];
+
+    @OneToMany(() => Evaluation, evaluation => evaluation.professional)
+    evaluations!: Evaluation[];
 }

@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserTypes } from '../types/UserTypes.enum';
 import { Professional } from 'src/professional/entities/professional.entity';
+import { Evaluation } from 'src/evaluation/entities/evaluation.entity';
 
 @Entity('usuário')
 export class User {
@@ -27,6 +28,9 @@ export class User {
 
   @OneToOne(() => Professional, professional => professional.user)
   professional!: Professional;
+
+  @OneToMany(() => Evaluation, evaluation => evaluation.patient)
+  evaluations!: Evaluation[]
 
   @Column({ nullable: true })
   resetToken!: string;
