@@ -100,4 +100,35 @@ export class EvaluationService {
       },
     });
   }
+
+  async updateEvaluation(userId: number, evaluationPublicId: string, body: Partial<IEvaluation>) {
+    const { rating, comment } = body;
+
+    const evaluation = await this._evaluationRepository.findOne({
+      where: {
+        publicId: evaluationPublicId,
+      },
+      relations: {
+        patient: true,
+      },
+    });
+
+    if (!evaluation) {
+      throw new NotFoundException('Avaliação não encontrada');
+    }
+
+    if (evaluation.patient.id !== userId) {
+      throw new ForbiddenException('Você não tem permissão para alterar essa avaliação');
+    }
+
+    if (rating !== undefined) {
+      evaluation.rating = rating;
+    }
+
+    if (comment !== undefined) {
+      evaluation.comment = comment;
+    }
+
+    return await this._evaluationRepository.save(evaluation);
+  }
 }

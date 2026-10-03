@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { EvaluationService } from './evaluation.service';
 import { CreateEvaluationDto } from './dto/create-evaluation.dto';
+import { UpdateEvaluationDto } from './dto/update-evaluation.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 
@@ -45,5 +46,26 @@ export class EvaluationController {
         profilePicture: evaluation.patient.profilePicture
       }
     }));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('update/:publicId')
+  async updateEvaluation(
+    @Req() request,
+    @Param('publicId') evaluationPublicId: string,
+    @Body() body: UpdateEvaluationDto
+  ){
+    const evaluation = await this.evaluationService.updateEvaluation(
+      request.user.id,
+      evaluationPublicId,
+      body
+    );
+
+    return{
+      publicId: evaluation.publicId,
+      rating: evaluation.rating,
+      comment: evaluation.comment,
+      createdAt: evaluation.createdAt
+    }
   }
 }

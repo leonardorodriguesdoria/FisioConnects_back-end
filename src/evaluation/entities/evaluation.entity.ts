@@ -1,6 +1,6 @@
 import { Professional } from "src/professional/entities/professional.entity";
 import { User } from "src/user/entities/user.entity";
-import { Check, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Check, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity('avaliacao')
 @Unique(['patient', 'professional'])
@@ -21,6 +21,9 @@ export class Evaluation {
 
     @CreateDateColumn()
     createdAt!: Date;
+
+    @UpdateDateColumn()
+    updatedAt!: Date;
 
     @ManyToOne(() => User, user => user.evaluations, {onDelete: 'CASCADE'})
     patient!: User;
