@@ -63,4 +63,41 @@ export class EvaluationService {
 
     return await this._evaluationRepository.save(newEvaluation);
   }
+
+
+  async listAllEvaluations(professionalPublicId: string) {
+    const professional = await this._professionalRepository.findOne({
+      where: {
+        publicId: professionalPublicId,
+      },
+    });
+
+    if (!professional) {
+      throw new NotFoundException('Profissional não encontrado');
+    }
+
+    return this._evaluationRepository.find({
+      where: {
+        professional: {
+          id: professional.id,
+        },
+      },
+      relations: {
+        patient: true,
+      },
+      select: {
+        publicId: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        patient: {
+          name: true,
+          profilePicture: true,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
 }

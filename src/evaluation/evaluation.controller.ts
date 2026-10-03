@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { EvaluationService } from './evaluation.service';
 import { CreateEvaluationDto } from './dto/create-evaluation.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -27,5 +27,23 @@ export class EvaluationController {
       comment: evaluation.comment,
       createdAt: evaluation.createdAt
     }
+  }
+
+  @Get(':publicId')
+  async listEvaluations(
+    @Param('publicId') professionalPublicId: string
+  ){
+    const evaluations = await this.evaluationService.listAllEvaluations(professionalPublicId);
+
+    return evaluations.map(evaluation => ({
+      publicId: evaluation.publicId,
+      rating: evaluation.rating,
+      comment: evaluation.comment,
+      createdAt: evaluation.createdAt,
+      patient: {
+        name: evaluation.patient.name,
+        profilePicture: evaluation.patient.profilePicture
+      }
+    }));
   }
 }
