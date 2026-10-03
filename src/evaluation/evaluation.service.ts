@@ -131,4 +131,25 @@ export class EvaluationService {
 
     return await this._evaluationRepository.save(evaluation);
   }
+
+  async deleteEvaluation(userId: number, evaluationPublicId: string) {
+    const evaluation = await this._evaluationRepository.findOne({
+      where: {
+        publicId: evaluationPublicId,
+      },
+      relations: {
+        patient: true,
+      },
+    });
+
+    if (!evaluation) {
+      throw new NotFoundException('Avaliação não encontrada');
+    }
+
+    if (evaluation.patient.id !== userId) {
+      throw new ForbiddenException('Você não tem permissão para excluir essa avaliação');
+    }
+
+    await this._evaluationRepository.remove(evaluation);
+  }
 }

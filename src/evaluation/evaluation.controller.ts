@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { EvaluationService } from './evaluation.service';
 import { CreateEvaluationDto } from './dto/create-evaluation.dto';
 import { UpdateEvaluationDto } from './dto/update-evaluation.dto';
@@ -67,5 +67,16 @@ export class EvaluationController {
       comment: evaluation.comment,
       createdAt: evaluation.createdAt
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':publicId')
+  async deleteEvaluation(
+    @Req() request,
+    @Param('publicId') evaluationPublicId: string
+  ){
+    await this.evaluationService.deleteEvaluation(request.user.id, evaluationPublicId);
+
+    return{message: 'Avaliação excluída com sucesso'}
   }
 }
