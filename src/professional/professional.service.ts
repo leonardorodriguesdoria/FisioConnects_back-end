@@ -8,7 +8,7 @@ import { ICreateProfessional } from 'src/shared/interfaces/user_interfaces/creat
 import { User } from 'src/user/entities/user.entity';
 import { UserTypes } from 'src/user/types/UserTypes.enum';
 import { AuthService } from 'src/auth/auth.service';
-
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class ProfessionalService {
@@ -49,6 +49,7 @@ export class ProfessionalService {
         await this._userRepository.save(newUser);
 
         const newProfessional = this._professionalRepository.create({
+            publicId: nanoid(),
             phone: phone,
             city: city,
             description: description,
