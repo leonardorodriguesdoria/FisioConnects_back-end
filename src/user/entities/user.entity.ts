@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGenerated
 import { UserTypes } from '../types/UserTypes.enum';
 import { Professional } from 'src/professional/entities/professional.entity';
 import { Evaluation } from 'src/evaluation/entities/evaluation.entity';
+import { Favorite } from 'src/favorites/entities/favorite.entity';
 
 @Entity('usuário')
 export class User {
@@ -31,6 +32,9 @@ export class User {
 
   @OneToMany(() => Evaluation, evaluation => evaluation.patient)
   evaluations!: Evaluation[]
+
+  @OneToMany(() => Favorite, favorite => favorite.patient)
+  favorites!: Favorite[]
 
   @Column({ nullable: true })
   resetToken!: string;

@@ -22,6 +22,8 @@ import { Professional } from './professional/entities/professional.entity';
 import { PatientModule } from './patient/patient.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { Evaluation } from './evaluation/entities/evaluation.entity';
+import { FavoritesModule } from './favorites/favorites.module';
+import { Favorite } from './favorites/entities/favorite.entity';
 
 
 @Module({
@@ -45,7 +47,7 @@ import { Evaluation } from './evaluation/entities/evaluation.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional, Evaluation],
+        entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional, Evaluation, Favorite],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,
       }),
@@ -61,6 +63,7 @@ import { Evaluation } from './evaluation/entities/evaluation.entity';
     MedicalRecordModule,
     PatientModule,
     EvaluationModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [

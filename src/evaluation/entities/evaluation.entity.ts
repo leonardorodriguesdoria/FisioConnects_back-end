@@ -17,7 +17,7 @@ export class Evaluation {
     rating!:number;
 
     @Column({type: 'text', nullable: true})
-    comment!:string;
+    comment!:string | null;
 
     @CreateDateColumn()
     createdAt!: Date;
