@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
             });
             //anexar os dados do usuário ao objeto request para usus posteriores
             request.user = {
-                id: decoded.sub,
+                id: Number(decoded.sub),
                 email: decoded.email
             }
         return true;
