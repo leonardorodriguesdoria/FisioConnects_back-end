@@ -33,6 +33,17 @@ export class AuthController {
     return userData;
   }
 
+  @Post('logout')
+  async logout(@Res({passthrough: true}) response: Response){
+    response.clearCookie('access_token', {
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+
+    return {message: 'Sessão encerrada'}
+  }
+
   @Post('request-otp')
     async requestOtp(@Body() requestTokenDto: RequestTokenDTO){
     const {email} = requestTokenDto;
