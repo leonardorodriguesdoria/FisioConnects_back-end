@@ -27,6 +27,9 @@ export class User {
   @Column({ default: 'https://ibb.co/27mgpNMx' })
   profilePicture!: string;
 
+  @Column({type: 'varchar', nullable: true})
+  profilePicturePublicId!: string | null;
+
   @OneToOne(() => Professional, professional => professional.user)
   professional!: Professional;
 

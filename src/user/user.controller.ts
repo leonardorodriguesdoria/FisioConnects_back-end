@@ -1,13 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Delete, UseGuards, UploadedFile, UseInterceptors, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Delete, UseGuards, UploadedFile, UseInterceptors, Req, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserInterceptor } from 'src/common/interceptors/interceptor';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly cloudinaryService: CloudinaryService
+  ) {}
   /*------------------------------------------------------------------------------------------- */
   /*ROTAS DE CRUD DE PERFIL DO USUÁRIOS */
 
@@ -29,18 +33,29 @@ export class UserController {
   @UseInterceptors(FileInterceptor('image'), UserInterceptor)
   async updateProfile(
     @Body() uptateUserDto: UpdateUserDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 5 * 1024 * 1024
+          }),
+          new FileTypeValidator({
+            fileType: /^image\/(jpeg|png|webp)$/,
+          })
+        ]
+      })
+    ) 
+    image: Express.Multer.File,
     @Req() request,
   ){
-    if (image) {
-      uptateUserDto.profilePicture = image.path
-    }
-    
-    await this.userService.updateUser(request.user.id,uptateUserDto);
+    const uploadedImage = image 
+    ? await this.cloudinaryService.uploadProfilePicture(image)
+    : undefined;
 
-    return {
-      message: 'Dados do perfil atualizados com sucesso!!!',
-    };
+    await this.userService.updateUser(request.user.id, uptateUserDto, uploadedImage);
+
+    return {message: 'Dados do perfil atualizados com sucesso! '}
   }
 
   @UseGuards(JwtAuthGuard)

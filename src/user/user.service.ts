@@ -54,7 +54,7 @@ export class UserService {
     }
   }
 
-  async updateUser(id: number,body: IUpdateUserProfile){
+  async updateUser(id: number,body: IUpdateUserProfile, uploadedImage?: {secureUrl: string; publicId: string}){
     try{
       const user = await this._userRepository.findOne({where: {id: id}})
       if(!user){
@@ -70,11 +70,18 @@ export class UserService {
           );
         }
       }
-      Object.assign(user, {
-        name: body.name,
-        email: body.email,
-        profilePicture: body.profilePicture
-      });
+      if(body.name !== undefined){
+        user.name = body.name
+      }
+
+      if(body.email !== undefined){
+        user.email = body.email;
+      }
+
+      if(uploadedImage){
+        user.profilePicture = uploadedImage.secureUrl;
+        user.profilePicturePublicId = uploadedImage.publicId
+      }
 
       const updatedUser = await this._userRepository.save(user);
       

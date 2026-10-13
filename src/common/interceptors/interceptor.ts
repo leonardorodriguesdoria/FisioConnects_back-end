@@ -30,7 +30,8 @@ export class UserInterceptor implements NestInterceptor{
             resetToken,
             resetTokenExpiresAt,
             accountStatus,
-            createdAt, 
+            createdAt,
+            profilePicturePublicId,
             ...rest
         } = user;
 
