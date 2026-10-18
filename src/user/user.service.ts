@@ -19,7 +19,7 @@ export class UserService {
 /*------------------------------------------------------------------------------------------- */
   /*FUNÇÕES DE CRUD DE PERFIL DO USUÁRIOS */
 
-  async getAllUsers(): Promise<Partial<User>[]> {
+  async getAllUsers() {
     const professionals = await this._professionalRepository.find({
         relations: {
             user: true
@@ -32,14 +32,33 @@ export class UserService {
         );
     }
 
-    return professionals.map(professional => ({
-        name: professional.user.name,
-        description: professional.description,
-        specialties: professional.specialties,
-        city: professional.city,
-        phone: professional.phone,
-        profilePicture: professional.user.profilePicture
-    }));
+    // Média e total de avaliações de cada profissional, calculados em uma única consulta
+    const ratingStats: {id: number; average: string | null; total: string}[] = await this._professionalRepository
+      .createQueryBuilder('professional')
+      .leftJoin('professional.evaluations', 'evaluation')
+      .select('professional.id', 'id')
+      .addSelect('AVG(evaluation.rating)', 'average')
+      .addSelect('COUNT(evaluation.id)', 'total')
+      .groupBy('professional.id')
+      .getRawMany();
+
+    const ratingByProfessional = new Map(ratingStats.map(stat => [Number(stat.id), stat]));
+
+    return professionals.map(professional => {
+        const stats = ratingByProfessional.get(professional.id);
+
+        return {
+            publicId: professional.publicId,
+            name: professional.user.name,
+            description: professional.description,
+            specialties: professional.specialties,
+            city: professional.city,
+            phone: professional.phone,
+            profilePicture: professional.user.profilePicture,
+            averageRating: stats?.average ? Math.round(Number(stats.average) * 10) / 10 : 0,
+            totalEvaluations: stats ? Number(stats.total) : 0
+        };
+    });
   }
 
   async getOneUser(id: number){
