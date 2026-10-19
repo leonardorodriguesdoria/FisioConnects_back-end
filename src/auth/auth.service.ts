@@ -30,6 +30,8 @@ createToken(user: User) {
         {
           name: user.name,
           email: user.email,
+          profilePicture: user.profilePicture,
+          role: user.role,
         },
         {
           expiresIn: '3 days',
@@ -39,7 +41,10 @@ createToken(user: User) {
         },
       ),
       userId: user.id,
-      email: user.email
+      name: user.name,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      role: user.role
     };
   }
 

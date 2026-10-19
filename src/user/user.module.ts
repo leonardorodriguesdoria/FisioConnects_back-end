@@ -13,6 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ProfessionalModule } from 'src/professional/professional.module';
 import { Professional } from 'src/professional/entities/professional.entity';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 const allowedMimeTypes = [
   'image/jpeg',
@@ -40,7 +41,7 @@ const allowedMimeTypes = [
         }
         callback(null, true);
       }
-    }),TypeOrmModule.forFeature([User, Professional]), JwtModule, ProfessionalModule, CloudinaryModule],
+    }),TypeOrmModule.forFeature([User, Professional]), JwtModule, ProfessionalModule, CloudinaryModule, AuthModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService]

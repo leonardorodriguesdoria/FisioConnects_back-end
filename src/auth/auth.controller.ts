@@ -4,6 +4,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { RequestTokenDTO } from 'src/auth/dto/request-token.dto';
 import type { Response } from 'express';
+import { clearAuthCookie, setAuthCookie } from './auth-cookie';
 
 @Controller('auth')
 export class AuthController {
@@ -20,13 +21,7 @@ export class AuthController {
       return result
     }
 
-    response.cookie('access_token', result.access_token,{
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 3 * 24 * 60 * 60 * 1000,
-    });
+    setAuthCookie(response, result.access_token);
 
     const {access_token, ...userData} = result;
 
@@ -35,11 +30,7 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res({passthrough: true}) response: Response){
-    response.clearCookie('access_token', {
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
+    clearAuthCookie(response);
 
     return {message: 'Sessão encerrada'}
   }

@@ -63,12 +63,33 @@ export class UserService {
 
   async getOneUser(id: number){
     try{
-      const user = await this._userRepository.findOne({where: {id: id}})
+      const user = await this._userRepository.findOne({
+        where: {id: id},
+        relations: {professional: true}
+      })
       if(!user){
         throw new NotFoundException("Usuário não encontrado")
       }
-      return user;
+
+      const {professional, ...userData} = user;
+
+      //Dados profissionais só existem para usuários do tipo profissional
+      return {
+        ...userData,
+        professional: professional
+          ? {
+              publicId: professional.publicId,
+              description: professional.description,
+              specialties: professional.specialties,
+              city: professional.city,
+              phone: professional.phone
+            }
+          : null
+      };
     }catch(error){
+      if(error instanceof NotFoundException){
+        throw error
+      }
       throw new InternalServerErrorException("Erro interno no sistema. Por favor, tente mais tarde")
     }
   }
@@ -111,6 +132,17 @@ export class UserService {
 
         if(!professional){
           throw new NotFoundException("Perfil profissional não encontrado")
+        }
+
+        if(body.phone && body.phone !== professional.phone){
+          const phoneInUse = await this._professionalRepository.findOne({
+            where: {phone: body.phone}
+          });
+          if(phoneInUse){
+            throw new ConflictException(
+              "Este telefone já está sendo usado por outro profissional"
+            );
+          }
         }
 
         Object.assign(professional, {
