@@ -11,4 +11,9 @@ export class ProfessionalController {
       await this._professionalService.createProfessional(createProfessionalDto);
       return{message: "Profissional cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
     }
+
+  @Get(':publicId')
+    async getProfessional(@Param('publicId') publicId: string){
+      return this._professionalService.getProfessionalByPublicId(publicId);
+    }
 }

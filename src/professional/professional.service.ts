@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Professional } from './entities/professional.entity';
@@ -60,5 +60,37 @@ export class ProfessionalService {
         await this._professionalRepository.save(newProfessional);
 
         return this._authService.emailVerification(newUser, OtpTypes.OTP)
+    }
+
+    // Mesmo formato de GET /user/home, para o front-end reaproveitar o modelo do profissional
+    async getProfessionalByPublicId(publicId: string){
+        const professional = await this._professionalRepository.findOne({
+            where: {publicId: publicId},
+            relations: {user: true}
+        });
+
+        if(!professional){
+            throw new NotFoundException('Profissional não encontrado');
+        }
+
+        const stats: {average: string | null; total: string} | undefined = await this._professionalRepository
+          .createQueryBuilder('professional')
+          .leftJoin('professional.evaluations', 'evaluation')
+          .select('AVG(evaluation.rating)', 'average')
+          .addSelect('COUNT(evaluation.id)', 'total')
+          .where('professional.id = :id', {id: professional.id})
+          .getRawOne();
+
+        return {
+            publicId: professional.publicId,
+            name: professional.user.name,
+            description: professional.description,
+            specialties: professional.specialties,
+            city: professional.city,
+            phone: professional.phone,
+            profilePicture: professional.user.profilePicture,
+            averageRating: stats?.average ? Math.round(Number(stats.average) * 10) / 10 : 0,
+            totalEvaluations: stats ? Number(stats.total) : 0
+        };
     }
 }
