@@ -75,7 +75,6 @@ export class PatientController {
         return {message: 'Evolução registrada com sucesso'}
     }
 
-    @UseInterceptors(UserInterceptor)
     @Get(':publicId/evolutions')
     async getEvolutions(
         @Req() request,

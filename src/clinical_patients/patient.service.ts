@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { ConflictException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ClinicalPatient } from "./entities/patient.entity";
 import { Repository } from "typeorm";
@@ -78,14 +78,10 @@ export class PatientService {
         if(!professional){
             throw new NotFoundException("Profissional não encontrado")
         }
-
-        const patients = await this._patientRepository.find({where: {professional: {id: professional.id}}})
-
-        if (patients.length === 0) {
-            throw new NotFoundException("Nenhum paciente cadastrado");
-        }
-
-        return patients;
+        return this._patientRepository.find({
+            where: {professional: {id: professional.id}},
+            order: {name: 'ASC'}
+        });
     }
 
     async getPatient(userId: number, publicId: string){
@@ -105,6 +101,9 @@ export class PatientService {
             }
             return patient;
         }catch(error){
+            if(error instanceof HttpException){
+                throw error;
+            }
             throw new InternalServerErrorException("Erro Interno do sistema.Por favor, tente mais tarde")
         }
     }
@@ -120,23 +119,32 @@ export class PatientService {
                             id: userId
                         }
                     }
-                }
+                },
+                relations: {professional: true}
             });
             if(!patient){
-                throw new NotFoundException("Usuário não encontrado!!!!")
+                throw new NotFoundException("Paciente não encontrado")
             }
             if(body.email && body.email !== patient.email){
-                const emailInUse = await this._userRepository.findOne({
-                where: {email: body.email}
-            });
-            if(emailInUse){
-                    throw new ConflictException("Este e-mail já está sendo usado por outro usuário");
+                const emailInUse = await this._patientRepository.findOne({
+                    where: {
+                        email: body.email,
+                        professional: {
+                            id: patient.professional.id
+                        }
+                    }
+                });
+                if(emailInUse){
+                    throw new ConflictException("Você já cadastrou um paciente com esse e-mail");
                 }
             }
             Object.assign(patient, body);
             const updatedPatient = await this._patientRepository.save(patient);
-            return updatedPatient; 
+            return updatedPatient;
         }catch(error){
+            if(error instanceof HttpException){
+                throw error;
+            }
             throw new InternalServerErrorException("Erro no sistema. Por favor tente novamente mais tarde")
         }
     }
@@ -236,10 +244,6 @@ export class PatientService {
             createdAt: 'ASC',
             },
         });
-
-        if(evolutions.length === 0){
-            throw new NotFoundException('Nenhuma evolução encontrada para este prontuário')
-        }
 
         return evolutions;
     }

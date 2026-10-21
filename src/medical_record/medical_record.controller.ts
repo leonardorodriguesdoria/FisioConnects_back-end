@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { MedicalRecordService } from './medical_record.service';
 import { CreateMedicalRecordDto } from './dto/create-medical_record.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -10,14 +10,27 @@ export class MedicalRecordController {
 
   @Post('register/:publicId')
   async registerMedicalRecord(
-    @Body() 
+    @Body()
     createMedicalRecordDto: CreateMedicalRecordDto,
     @Req()
     request,
-    @Param(':publicId') 
+    @Param('publicId')
     publicId: string
   ){
     await this.medicalRecordService.createMedicalRecord(request.user.id, createMedicalRecordDto, publicId);
     return {message: "Prontuário cadastrado com sucesso!!!"}
+  }
+
+  @Get()
+  async listMedicalRecords(@Req() request){
+    return this.medicalRecordService.getAllMedicalRecords(request.user.id);
+  }
+
+  @Get('patient/:publicId')
+  async listPatientMedicalRecords(
+    @Req() request,
+    @Param('publicId') publicId: string
+  ){
+    return this.medicalRecordService.getPatientMedicalRecords(request.user.id, publicId);
   }
 }
