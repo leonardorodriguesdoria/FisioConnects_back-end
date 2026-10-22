@@ -30,6 +30,27 @@ export class EvaluationController {
     }
   }
 
+  // Permite ao front saber se o paciente logado já avaliou o profissional (para editar/excluir)
+  @UseGuards(JwtAuthGuard)
+  @Get('mine/:publicId')
+  async getMyEvaluation(
+    @Req() request,
+    @Param('publicId') professionalPublicId: string
+  ){
+    const evaluation = await this.evaluationService.findPatientEvaluation(request.user.id, professionalPublicId);
+
+    if(!evaluation){
+      return null;
+    }
+
+    return{
+      publicId: evaluation.publicId,
+      rating: evaluation.rating,
+      comment: evaluation.comment,
+      createdAt: evaluation.createdAt
+    }
+  }
+
   @Get(':publicId')
   async listEvaluations(
     @Param('publicId') professionalPublicId: string

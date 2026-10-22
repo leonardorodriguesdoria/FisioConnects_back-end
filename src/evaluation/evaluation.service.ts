@@ -101,6 +101,20 @@ export class EvaluationService {
     });
   }
 
+  // Avaliação do paciente logado para o profissional informado (ou null, se ainda não avaliou)
+  async findPatientEvaluation(userId: number, professionalPublicId: string) {
+    return this._evaluationRepository.findOne({
+      where: {
+        patient: {
+          id: userId,
+        },
+        professional: {
+          publicId: professionalPublicId,
+        },
+      },
+    });
+  }
+
   async updateEvaluation(userId: number, evaluationPublicId: string, body: Partial<IEvaluation>) {
     const { rating, comment } = body;
 
