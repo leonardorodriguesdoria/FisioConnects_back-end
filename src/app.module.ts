@@ -24,6 +24,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
 import { Evaluation } from './evaluation/entities/evaluation.entity';
 import { FavoritesModule } from './favorites/favorites.module';
 import { Favorite } from './favorites/entities/favorite.entity';
+import { PdfReportModule } from './pdf_report/pdf_report.module';
 
 
 @Module({
@@ -64,6 +65,7 @@ import { Favorite } from './favorites/entities/favorite.entity';
     PatientModule,
     EvaluationModule,
     FavoritesModule,
+    PdfReportModule,
   ],
   controllers: [AppController],
   providers: [
