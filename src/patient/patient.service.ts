@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { hashPassword } from 'src/common/utils/hashPassword';
 import { OtpTypes } from 'src/otp/types/otpType';
 import { ICreatePatient } from 'src/shared/interfaces/user_interfaces/createPatient.interface';
@@ -14,10 +15,12 @@ export class PatientService {
         @InjectRepository(User) 
         private readonly _userRepository: Repository<User>,
         
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+
+        private readonly _cloudinaryService: CloudinaryService
     ){}
 
-    async createPatient(body:ICreatePatient): Promise<void>{
+    async createPatient(body:ICreatePatient, image?: Express.Multer.File): Promise<void>{
           const {name ,email , password } = body;
           
           const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
@@ -27,12 +30,21 @@ export class PatientService {
           }
     
           const hashedPassword = await hashPassword(password)
-    
+
+          // Upload feito só após as validações, para não deixar imagens órfãs no Cloudinary
+          const uploadedImage = image
+            ? await this._cloudinaryService.uploadProfilePicture(image)
+            : undefined;
+
           const newPatient = this._userRepository.create({
             name: name,
             email: email,
             password: hashedPassword,
-            role: UserTypes.PATIENT
+            role: UserTypes.PATIENT,
+            ...(uploadedImage && {
+              profilePicture: uploadedImage.secureUrl,
+              profilePicturePublicId: uploadedImage.publicId
+            })
           });
     
           await this._userRepository.save(newPatient);

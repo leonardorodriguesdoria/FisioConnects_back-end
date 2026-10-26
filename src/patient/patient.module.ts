@@ -5,9 +5,10 @@ import { User } from 'src/user/entities/user.entity';
 import { PatientService } from './patient.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PatintController } from './patient.controller';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), AuthModule, JwtModule],
+    imports: [TypeOrmModule.forFeature([User]), AuthModule, JwtModule, CloudinaryModule],
     controllers: [PatintController],
     providers: [PatientService],
     exports: [PatientService]

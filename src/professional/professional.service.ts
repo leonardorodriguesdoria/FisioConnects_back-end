@@ -8,6 +8,7 @@ import { ICreateProfessional } from 'src/shared/interfaces/user_interfaces/creat
 import { User } from 'src/user/entities/user.entity';
 import { UserTypes } from 'src/user/types/UserTypes.enum';
 import { AuthService } from 'src/auth/auth.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { nanoid } from "nanoid";
 
 @Injectable()
@@ -18,11 +19,13 @@ export class ProfessionalService {
     @InjectRepository(Professional)
     private readonly _professionalRepository: Repository<Professional>,
 
-    private readonly _authService: AuthService
+    private readonly _authService: AuthService,
+
+    private readonly _cloudinaryService: CloudinaryService
 ){}
 
 
-    async createProfessional(body: ICreateProfessional): Promise<void>{
+    async createProfessional(body: ICreateProfessional, image?: Express.Multer.File): Promise<void>{
         const {name, email, phone, password,city, specialties, description} = body;
 
         const userAlreadyExists =await this._userRepository.findOne({where:{email: email}});
@@ -39,11 +42,20 @@ export class ProfessionalService {
 
         const hashedPassword = await hashPassword(password)
 
+        // Upload feito só após as validações, para não deixar imagens órfãs no Cloudinary
+        const uploadedImage = image
+            ? await this._cloudinaryService.uploadProfilePicture(image)
+            : undefined;
+
         const newUser = this._userRepository.create({
             name: name,
             email: email,
             password: hashedPassword,
-            role: UserTypes.PROFESSIONAL
+            role: UserTypes.PROFESSIONAL,
+            ...(uploadedImage && {
+                profilePicture: uploadedImage.secureUrl,
+                profilePicturePublicId: uploadedImage.publicId
+            })
         });
 
         await this._userRepository.save(newUser);
