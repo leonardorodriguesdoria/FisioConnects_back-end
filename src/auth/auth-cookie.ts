@@ -1,22 +1,26 @@
-import type { Response } from 'express';
+import type { CookieOptions, Response } from 'express';
 
 const AUTH_COOKIE_NAME = 'access_token';
 
-const authCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/',
-};
+function getAuthCookieOptions(): CookieOptions {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const sameSite = (process.env.COOKIE_SAMESITE ?? 'lax') as 'lax' | 'strict' | 'none';
 
-//Grava o token de acesso no cookie, usado no login e ao atualizar os dados do perfil
+  return {
+    httpOnly: true,
+    secure: isProduction || sameSite === 'none',
+    sameSite,
+    path: '/',
+  };
+}
+
 export function setAuthCookie(response: Response, accessToken: string){
   response.cookie(AUTH_COOKIE_NAME, accessToken, {
-    ...authCookieOptions,
+    ...getAuthCookieOptions(),
     maxAge: 3 * 24 * 60 * 60 * 1000,
   });
 }
 
 export function clearAuthCookie(response: Response){
-  response.clearCookie(AUTH_COOKIE_NAME, authCookieOptions);
+  response.clearCookie(AUTH_COOKIE_NAME, getAuthCookieOptions());
 }
