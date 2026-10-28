@@ -45,6 +45,9 @@ export class User {
   @Column({ nullable: true, type: 'timestamp' })
   resetTokenExpiresAt!: Date;
 
+  @Column({ nullable: true, type: 'timestamp' })
+  passwordChangedAt!: Date | null;
+
   @Column({ default: 'unverified' })
   accountStatus!: 'verified' | 'unverified';
 

@@ -32,7 +32,7 @@ import { PdfReportModule } from './pdf_report/pdf_report.module';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10,
+        limit: 120,
       },
     ]),
     ConfigModule.forRoot({

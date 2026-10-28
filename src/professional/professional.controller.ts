@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfessionalService } from './professional.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
@@ -7,6 +8,7 @@ import { CreateProfessionalDto } from './dto/create-professional.dto';
 export class ProfessionalController {
   constructor(private readonly _professionalService: ProfessionalService){}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   @UseInterceptors(FileInterceptor('image'))
     async registerNewProfessional(
@@ -26,8 +28,10 @@ export class ProfessionalController {
       )
       image?: Express.Multer.File,
     ){
-      await this._professionalService.createProfessional(createProfessionalDto, image);
-      return{message: "Profissional cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"}
+      const emailSent = await this._professionalService.createProfessional(createProfessionalDto, image);
+      return{message: emailSent
+        ? "Profissional cadastrado com sucesso!.\n Um código para verificação de conta foi enviado para seu e-mail"
+        : "Profissional cadastrado com sucesso!.\n Não foi possível enviar o código de verificação agora. Use a opção de reenviar código ao fazer login"}
     }
 
   @Get(':publicId')

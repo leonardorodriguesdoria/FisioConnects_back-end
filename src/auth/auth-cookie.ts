@@ -4,7 +4,8 @@ const AUTH_COOKIE_NAME = 'access_token';
 
 function getAuthCookieOptions(): CookieOptions {
   const isProduction = process.env.NODE_ENV === 'production';
-  const sameSite = (process.env.COOKIE_SAMESITE ?? 'lax') as 'lax' | 'strict' | 'none';
+  const configured = (process.env.COOKIE_SAMESITE ?? 'lax').trim().toLowerCase();
+  const sameSite = (['lax', 'strict', 'none'].includes(configured) ? configured : 'lax') as 'lax' | 'strict' | 'none';
 
   return {
     httpOnly: true,

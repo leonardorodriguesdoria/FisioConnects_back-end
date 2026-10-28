@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { hashPassword } from 'src/common/utils/hashPassword';
-import { OtpTypes } from 'src/otp/types/otpType';
 import { ICreatePatient } from 'src/shared/interfaces/user_interfaces/createPatient.interface';
 import { User } from 'src/user/entities/user.entity';
 import { UserTypes } from 'src/user/types/UserTypes.enum';
@@ -20,7 +19,7 @@ export class PatientService {
         private readonly _cloudinaryService: CloudinaryService
     ){}
 
-    async createPatient(body:ICreatePatient, image?: Express.Multer.File): Promise<void>{
+    async createPatient(body:ICreatePatient, image?: Express.Multer.File): Promise<boolean>{
           const {name ,email , password } = body;
           
           const userAlreadyExists = await this._userRepository.findOne({where: {email: email}})
@@ -31,7 +30,6 @@ export class PatientService {
     
           const hashedPassword = await hashPassword(password)
 
-          // Upload feito só após as validações, para não deixar imagens órfãs no Cloudinary
           const uploadedImage = image
             ? await this._cloudinaryService.uploadProfilePicture(image)
             : undefined;
@@ -48,6 +46,6 @@ export class PatientService {
           });
     
           await this._userRepository.save(newPatient);
-          return this._authService.emailVerification(newPatient, OtpTypes.OTP)
+          return this._authService.sendVerificationCodeAfterSignup(newPatient)
       }
 }

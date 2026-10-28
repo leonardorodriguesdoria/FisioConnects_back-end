@@ -25,24 +25,20 @@ export class OtpService {
 ): Promise<string> {
 
   if (type === OtpTypes.OTP) {
-    //Gera um código OTP de 6 digítos
     const otp = crypto.randomInt(100000, 999999).toString();
     const hashedOTP = await bcrypt.hash(otp, 10);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 5 * 60 * 1000);
 
-    //Faz o check-up se o código já existe para aquele usuário
     const existingOTP = await this.otpRepository.findOne({
       where: { user: { id: user.id }, type }
     });
 
     if (existingOTP) {
-      //Atualiza o código existente
       existingOTP.token = hashedOTP;
       existingOTP.expiresAt = expiresAt;
       await this.otpRepository.save(existingOTP);
     } else {
-      //Cria uma entidade de OTP
       const otpEntity = this.otpRepository.create({
         user,
         token: hashedOTP,
@@ -57,13 +53,12 @@ export class OtpService {
     const resetToken = this._jwtService.sign(
       { id: user.id, email: user.email },
       {
-        secret: this.configService.get<string>('JWT_RESET_SECRET'),
+        secret: this.resetSecret(user.password),
         expiresIn: '15m',
       },
     );
     return resetToken;
   }
-  // ✅ garante retorno em todos os caminhos
   throw new Error('Tipo de token não suportado');
 }
 
@@ -84,17 +79,27 @@ export class OtpService {
     return true;
   }
 
+  private resetSecret(passwordHash: string){
+    return `${this.configService.getOrThrow<string>('JWT_RESET_SECRET')}${passwordHash}`;
+  }
+
+  getResetTokenUserId(token: string): number{
+    const decoded = this._jwtService.decode(token);
+    const userId = Number(decoded?.id);
+    if(!Number.isInteger(userId) || userId <= 0){
+      throw new BadRequestException('Token inválido. Por favor solicite um novo e-mail de redefinição');
+    }
+    return userId;
+  }
+
   //Função de validação de redefinição de senha
-  async validateResetPassword(token: string){
+  async validateResetPassword(token: string, passwordHash: string){
     try{
-      //verifica o token JWT e o decodifica
       const decoded = this._jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_RESET_SECRET')
+        secret: this.resetSecret(passwordHash)
       });
-      //Retorna o id do usuário extraído do token se a verificação for um sucesso
       return decoded.id;
     }catch(error){
-      //Tratamento de token expirado
       if(error?.name === 'TokenExpiredError'){
         throw new BadRequestException(
           'O link de redefinição de senha expirou.\nPor favor solicite um novo'

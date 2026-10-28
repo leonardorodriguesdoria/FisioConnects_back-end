@@ -32,6 +32,7 @@ export class UserInterceptor implements NestInterceptor{
             accountStatus,
             createdAt,
             profilePicturePublicId,
+            passwordChangedAt,
             ...rest
         } = user;
 

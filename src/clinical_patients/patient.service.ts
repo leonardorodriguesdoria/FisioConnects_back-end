@@ -138,7 +138,11 @@ export class PatientService {
                     throw new ConflictException("Você já cadastrou um paciente com esse e-mail");
                 }
             }
-            Object.assign(patient, body);
+            const {name, birthday, gender, phone, email, address, profession, nationality, picture} = body;
+            Object.assign(patient, Object.fromEntries(
+                Object.entries({name, birthday, gender, phone, email, address, profession, nationality, picture})
+                    .filter(([, value]) => value !== undefined)
+            ));
             const updatedPatient = await this._patientRepository.save(patient);
             return updatedPatient;
         }catch(error){

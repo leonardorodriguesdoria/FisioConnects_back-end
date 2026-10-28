@@ -1,18 +1,18 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, Logger, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { IUserLogin } from 'src/shared/interfaces/user_interfaces/loginUser.interface';
-import { comparePassword } from 'src/common/utils/hashPassword';
+import { comparePassword, hashPassword } from 'src/common/utils/hashPassword';
 import { OtpService } from 'src/otp/otp.service';
-import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from 'src/email/email.service';
 import { OtpTypes } from 'src/otp/types/otpType';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private issuer = 'login';
   private audience = 'user';
   constructor(
@@ -106,8 +106,6 @@ createToken(user: User) {
     return await this._userRepository.save(user);
   }
 
-
-  //Enviar código de verificação o link de reset via email
   async emailVerification(user: User, otpType: OtpTypes){
       const token = await this._otpService.generateToken(user, otpType)
   
@@ -118,7 +116,6 @@ createToken(user: User) {
         html: `Seu código de verificação de conta é: <strong>${token}</strong>`
       }
   
-      //Envia código de verificação para o e-mail
       return await this._emailService.sendEmail(emailDto)
     }else if(otpType === OtpTypes.RESET_LINK){
       const resetLink = `${this._configService.get('RESET_PASSWORD_URL')}?token=${token}`
@@ -128,25 +125,38 @@ createToken(user: User) {
         html: `Clique no link a seguir para redefinir sua senha: <p><a href="${resetLink}">Redefinir Senha</a></p>`
       };
   
-      //Envia o link de redefinição de senha via e-mail
       return await this._emailService.sendEmail(emailDto)
     }
   }
     
+  async sendVerificationCodeAfterSignup(user: User): Promise<boolean>{
+    try{
+      await this.emailVerification(user, OtpTypes.OTP);
+      return true;
+    }catch(error){
+      this.logger.warn(`Código de verificação não enviado para o usuário ${user.id}`);
+      return false;
+    }
+  }
+
     //Verifica se o e-mail informado está cadastrado para requisição de um novo código de verificação
   async findByEmail(email: string){
       return await this._userRepository.findOne({where: {email: email}})
   }
 
   async resetPassword(token: string, newPassword: string): Promise<string>{
-    const userId = await this._otpService.validateResetPassword(token)
+    const userId = this._otpService.getResetTokenUserId(token)
     const user = await this._userRepository.findOne({where: {id: userId}});
     
     if(!user){
       throw new BadRequestException('Usuário não encontrado')
     }
+
+    await this._otpService.validateResetPassword(token, user.password)
     
-    user.password = await argon2.hash(newPassword);
+    user.password = await hashPassword(newPassword);
+    //Sessões (JWT) emitidas antes desta data deixam de ser aceitas pelo JwtAuthGuard
+    user.passwordChangedAt = new Date();
     await this._userRepository.save(user);
     
     return 'Senha redefinida com sucesso!!!'

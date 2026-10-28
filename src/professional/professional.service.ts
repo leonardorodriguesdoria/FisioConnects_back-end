@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Professional } from './entities/professional.entity';
 import { hashPassword } from 'src/common/utils/hashPassword';
-import { OtpTypes } from 'src/otp/types/otpType';
 import { ICreateProfessional } from 'src/shared/interfaces/user_interfaces/createProfessional.interface';
 import { User } from 'src/user/entities/user.entity';
 import { UserTypes } from 'src/user/types/UserTypes.enum';
@@ -24,8 +23,7 @@ export class ProfessionalService {
     private readonly _cloudinaryService: CloudinaryService
 ){}
 
-
-    async createProfessional(body: ICreateProfessional, image?: Express.Multer.File): Promise<void>{
+    async createProfessional(body: ICreateProfessional, image?: Express.Multer.File): Promise<boolean>{
         const {name, email, phone, password,city, specialties, description} = body;
 
         const userAlreadyExists =await this._userRepository.findOne({where:{email: email}});
@@ -42,7 +40,6 @@ export class ProfessionalService {
 
         const hashedPassword = await hashPassword(password)
 
-        // Upload feito só após as validações, para não deixar imagens órfãs no Cloudinary
         const uploadedImage = image
             ? await this._cloudinaryService.uploadProfilePicture(image)
             : undefined;
@@ -58,23 +55,24 @@ export class ProfessionalService {
             })
         });
 
-        await this._userRepository.save(newUser);
+        await this._userRepository.manager.transaction(async manager => {
+            await manager.save(newUser);
 
-        const newProfessional = this._professionalRepository.create({
-            publicId: nanoid(),
-            phone: phone,
-            city: city,
-            description: description,
-            specialties: specialties,
-            user: newUser
-        })
+            const newProfessional = manager.create(Professional, {
+                publicId: nanoid(),
+                phone: phone,
+                city: city,
+                description: description,
+                specialties: specialties,
+                user: newUser
+            });
 
-        await this._professionalRepository.save(newProfessional);
+            await manager.save(newProfessional);
+        });
 
-        return this._authService.emailVerification(newUser, OtpTypes.OTP)
+        return this._authService.sendVerificationCodeAfterSignup(newUser)
     }
 
-    // Mesmo formato de GET /user/home, para o front-end reaproveitar o modelo do profissional
     async getProfessionalByPublicId(publicId: string){
         const professional = await this._professionalRepository.findOne({
             where: {publicId: publicId},

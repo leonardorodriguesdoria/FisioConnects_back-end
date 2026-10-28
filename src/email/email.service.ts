@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { sendEmailDto } from './dto/email.dto';
 
 @Injectable()
 export class EmailService {
+  private readonly logger = new Logger(EmailService.name);
+
   constructor(private readonly configService: ConfigService) {}
 
   emailTransport() {
@@ -33,9 +35,11 @@ export class EmailService {
     };
     try {
       await transport.sendMail(options);
-      console.log('Email enviado com sucesso!!');
     } catch (error) {
-      console.log('Erro ao enviar o email: ', error);
+      this.logger.error('Erro ao enviar o e-mail', error instanceof Error ? error.stack : String(error));
+      throw new ServiceUnavailableException(
+        'Não foi possível enviar o e-mail no momento. Tente novamente em alguns minutos',
+      );
     }
   }
 }
