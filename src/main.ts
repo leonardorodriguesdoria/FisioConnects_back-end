@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { setupSwagger } from './config/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -33,6 +34,12 @@ async function bootstrap() {
       whitelist: true
     })
   )
+
+  //Documentação disponível em /docs. Em produção só é exposta se SWAGGER_ENABLED=true
+  if(process.env.NODE_ENV !== 'production' || process.env.SWAGGER_ENABLED === 'true'){
+    setupSwagger(app);
+  }
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
