@@ -47,7 +47,7 @@ import { PdfReportModule } from './pdf_report/pdf_report.module';
         port: Number(configService.get('DB_PORT')),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
+        database: configService.get('DB_NAME'),
         entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional, Evaluation, Favorite],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,

@@ -12,7 +12,7 @@ const AppDataSource = new DataSource({
   port: Number(configService.get('DB_PORT')),
   username: configService.get<string>('DB_USERNAME'),
   password: configService.get<string>('DB_PASSWORD'),
-  database: configService.get<string>('DB_DATABASE'),
+  database: configService.get<string>('DB_NAME'),
   synchronize: false,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
