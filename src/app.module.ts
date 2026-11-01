@@ -48,6 +48,7 @@ import { PdfReportModule } from './pdf_report/pdf_report.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
+        ssl: configService.get('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false,
         entities: [User, OTP, ClinicalPatient, MedicalRecord, Evolution, Professional, Evaluation, Favorite],
         migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
         synchronize: false,
